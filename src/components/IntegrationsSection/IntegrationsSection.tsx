@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 
 export default function IntegrationsSection() {
   const integrations = [
@@ -56,7 +57,7 @@ export default function IntegrationsSection() {
   ]
 
   return (
-    <section className="pt-12 pb-24 section-animate" style={{opacity: 0, filter: 'blur(12px)'}}>
+    <AnimatedSection className="pt-12 pb-24" delay={400}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Works with your favorite tools</h2>
@@ -94,6 +95,6 @@ export default function IntegrationsSection() {
           ))}
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   )
 }

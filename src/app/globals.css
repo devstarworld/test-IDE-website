@@ -67,7 +67,81 @@ body {
   font-family: 'Manrope', sans-serif;
 }
 
-/* Custom animations */
+/* Button styles */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: rgb(31, 136, 61);
+  color: white;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  padding: 1.5rem 2rem;
+  font-size: 1.125rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover {
+  background-color: rgb(25, 110, 49);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary.text-sm {
+  font-size: 0.8125rem;
+}
+
+.btn-primary.h-8 {
+  height: 2rem;
+}
+
+.btn-primary.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.btn-primary.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: hsl(var(--foreground));
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  padding: 1.5rem 2rem;
+  font-size: 1.125rem;
+}
+
+.btn-secondary:hover {
+  background-color: hsl(var(--muted));
+}
+
+.btn-secondary:active {
+  background-color: hsl(var(--muted));
+  opacity: 0.8;
+}
+
+/* Custom animations - kept for reference but not used */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -84,17 +158,3 @@ body {
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
 }
-
-/* Initial state for sections */
-.section-animate {
-  opacity: 0;
-  filter: blur(12px);
-  animation: fadeInUp 0.8s ease-out forwards;
-}
-
-.section-animate:nth-child(1) { animation-delay: 0.1s; }
-.section-animate:nth-child(2) { animation-delay: 0.2s; }
-.section-animate:nth-child(3) { animation-delay: 0.3s; }
-.section-animate:nth-child(4) { animation-delay: 0.4s; }
-.section-animate:nth-child(5) { animation-delay: 0.5s; }
-.section-animate:nth-child(6) { animation-delay: 0.6s; }

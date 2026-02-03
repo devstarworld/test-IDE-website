@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 
 export default function Footer() {
   return (
-    <footer className="relative border-t bg-muted/20 overflow-hidden section-animate" style={{opacity: 0, filter: 'blur(12px)'}}>
+    <AnimatedSection className="relative border-t bg-muted/20 overflow-hidden" delay={600}>
       <div className="absolute inset-0 pointer-events-none -z-10">
         <Image
           src="/images/footer-gradient.webp"
@@ -205,6 +206,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </AnimatedSection>
   )
 }

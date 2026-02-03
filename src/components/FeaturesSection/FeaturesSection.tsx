@@ -1,5 +1,7 @@
 'use client'
 
+import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
+
 export default function FeaturesSection() {
   const features = [
     {
@@ -26,7 +28,7 @@ export default function FeaturesSection() {
   ]
 
   return (
-    <section className="py-24 section-animate" style={{opacity: 0, filter: 'blur(12px)'}}>
+    <AnimatedSection className="py-24" delay={300}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-center mb-16">Run agents on every PR</h2>
         
@@ -62,6 +64,6 @@ export default function FeaturesSection() {
           ))}
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   )
 }

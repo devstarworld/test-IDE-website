@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Manrope } from 'next/font/google'
 import './globals.css'
+import { FirebaseProvider } from '@/contexts/FirebaseContext'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -67,10 +68,11 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${manrope.variable}`}>
       <head>
         <link rel="preload" as="image" href="/images/footer-gradient.webp" />
-        <script src="/animations.js" defer></script>
       </head>
       <body className={`min-h-screen bg-background font-sans antialiased ${inter.className}`}>
-        {children}
+        <FirebaseProvider>
+          {children}
+        </FirebaseProvider>
       </body>
     </html>
   )
