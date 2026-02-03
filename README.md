@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Continue.dev Clone - Next.js Implementation
 
-## Getting Started
+A pixel-perfect clone of the Continue.dev website built with Next.js 16, React 19, and Tailwind CSS.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js App Router** - Modern file-based routing
+- **React 19** - Latest React features and optimizations
+- **Tailwind CSS v4** - Utility-first CSS framework
+- **TypeScript** - Type-safe development
+- **Responsive Design** - Mobile-first approach
+- **SEO Optimized** - Meta tags, Open Graph, and Twitter Cards
+- **Performance Optimized** - Image optimization and lazy loading
+
+## 📁 Project Structure
+
+```
+continue-clone/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── about-us/          # About page
+│   │   ├── get-in-touch/      # Contact page
+│   │   ├── login/             # Login page
+│   │   ├── pricing/           # Pricing page
+│   │   ├── signup/            # Signup page
+│   │   ├── continuedev/       # Integration pages
+│   │   ├── globals.css        # Global styles
+│   │   ├── layout.tsx         # Root layout
+│   │   └── page.tsx           # Homepage
+│   └── components/            # Reusable React components
+│       ├── Navbar/           # Navigation component
+│       ├── HeroSection/      # Hero section
+│       ├── VideoSection/     # Video placeholder
+│       ├── FeaturesSection/  # Features grid
+│       ├── IntegrationsSection/ # Integrations showcase
+│       ├── CTASection/       # Call-to-action
+│       └── Footer/           # Footer component
+├── public/                   # Static assets
+│   └── images/              # Copied from original site
+└── .env.local               # Environment variables
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 16.1.6
+- **React**: 19.2.3
+- **Styling**: Tailwind CSS v4
+- **Language**: TypeScript
+- **Fonts**: Inter & Manrope (Google Fonts)
+- **Icons**: Heroicons & custom SVGs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎨 Design System
 
-## Learn More
+The project maintains pixel-perfect fidelity to the original Continue.dev website:
 
-To learn more about Next.js, take a look at the following resources:
+- **Colors**: Custom CSS variables for consistent theming
+- **Typography**: Inter for body text, Manrope for headings
+- **Animations**: Fade-in effects and hover transitions
+- **Layout**: Responsive grid system with mobile-first approach
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚦 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-## Deploy on Vercel
+2. **Start development server**:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📱 Pages
+
+- **Homepage** (`/`) - Hero, features, integrations, and CTA
+- **Login** (`/login`) - User authentication page
+- **Signup** (`/signup`) - User registration page
+- **Pricing** (`/pricing`) - Pricing plans and features
+- **About Us** (`/about-us`) - Company information and team
+- **Contact** (`/get-in-touch`) - Contact form and information
+- **Integration Pages** (`/continuedev/*`) - Individual agent documentation
+
+## 🔧 Environment Variables
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+## 🎯 Key Features Implemented
+
+### ✅ UI Components
+- [x] Responsive navigation with mobile menu
+- [x] Hero section with gradient text
+- [x] Feature cards with hover effects
+- [x] Integration showcase grid
+- [x] Footer with social links
+- [x] Call-to-action sections
+
+### ✅ Pages
+- [x] Homepage with all sections
+- [x] Authentication pages (login/signup)
+- [x] Pricing page with plans
+- [x] About us page
+- [x] Contact page
+- [x] Integration detail pages
+
+### ✅ Technical
+- [x] SEO optimization
+- [x] Image optimization
+- [x] Responsive design
+- [x] TypeScript implementation
+- [x] Clean component architecture
+
+## 🚀 Deployment
+
+The project is ready for deployment on Vercel, Netlify, or any other Next.js-compatible platform.
+
+```bash
+npm run build
+npm start
+```
+
+## 📝 Notes
+
+- All images and assets are copied from the original Continue.dev site
+- The project maintains the exact visual design and layout
+- Authentication pages are styled but not functionally connected
+- Integration pages are placeholder implementations
+- The video section shows a placeholder (original had an embedded video)
+
+## 🤝 Contributing
+
+This is a clone project for demonstration purposes. The original Continue.dev website belongs to Continue, Inc.
+
+## 📄 License
+
+This project is for educational and demonstration purposes only. All design and content rights belong to Continue, Inc.
