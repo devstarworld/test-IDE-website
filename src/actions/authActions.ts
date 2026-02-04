@@ -1,19 +1,15 @@
-import { 
-  createUserWithEmailAndPassword, 
-  sendEmailVerification, 
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth'
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs
+import {
+  doc,
+  setDoc,
+  getDoc
 } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { AppDispatch } from '@/store'
@@ -41,16 +37,16 @@ const isFirebaseReady = (): boolean => {
 // Test Firebase connectivity
 export const testFirebaseConnectivity = async (): Promise<{ success: boolean; message: string; details: any }> => {
   const details: any = {}
-  
+
   try {
     console.log('Testing Firebase connectivity...')
-    
+
     // Test 1: Check if Firebase services are initialized
     details.servicesInitialized = {
       auth: !!auth,
       firestore: !!db
     }
-    
+
     if (!auth || !db) {
       return {
         success: false,
@@ -58,14 +54,14 @@ export const testFirebaseConnectivity = async (): Promise<{ success: boolean; me
         details
       }
     }
-    
+
     // Test 2: Check Firebase configuration
     details.config = {
       authDomain: auth.app.options.authDomain,
       projectId: auth.app.options.projectId,
       apiKey: auth.app.options.apiKey ? 'Present' : 'Missing'
     }
-    
+
     // Test 3: Try to access Firebase Auth (this will test network connectivity)
     try {
       // This should work even without authentication
@@ -80,7 +76,7 @@ export const testFirebaseConnectivity = async (): Promise<{ success: boolean; me
         error: authError.message
       }
     }
-    
+
     // Test 4: Try a simple network request to Firebase
     try {
       // Try to create a user with invalid credentials to test network connectivity
@@ -92,7 +88,7 @@ export const testFirebaseConnectivity = async (): Promise<{ success: boolean; me
         errorMessage: testError.message,
         networkWorking: testError.code !== 'auth/network-request-failed'
       }
-      
+
       if (testError.code === 'auth/network-request-failed') {
         return {
           success: false,
@@ -101,19 +97,19 @@ export const testFirebaseConnectivity = async (): Promise<{ success: boolean; me
         }
       }
     }
-    
+
     return {
       success: true,
       message: 'Firebase connectivity test passed',
       details
     }
-    
+
   } catch (error: any) {
     details.generalError = {
       code: error.code,
       message: error.message
     }
-    
+
     return {
       success: false,
       message: `Firebase connectivity test failed: ${error.message}`,
@@ -127,29 +123,18 @@ export const initializeAdmin = async (): Promise<void> => {
   try {
     // Check if Firebase services are ready
     if (!isFirebaseReady() || !auth || !db) {
-      return // Silent return - no logging for service readiness
+      return
     }
 
-    // First check if users collection has any data
-    const usersRef = collection(db, 'users')
-    const usersSnapshot = await getDocs(usersRef)
-    
-    // If users collection is not empty, don't initialize admin
-    if (!usersSnapshot.empty) {
-      return // Silent return - users exist, no need for admin initialization
-    }
-    
-    console.log('Users collection is empty, initializing admin user...')
-    
-    // Try to create admin user in Firebase Auth first
+    // Simply try to create admin user - if it exists, Firebase will tell us
     try {
       const adminCredential = await createUserWithEmailAndPassword(
         auth,
         'admin@admin.com',
         '123456'
       )
-      
-      // Now that we have an authenticated user, add to Firestore
+
+      // Now add to Firestore (we're authenticated as the new admin)
       await setDoc(doc(db, 'users', adminCredential.user.uid), {
         name: 'admin',
         email: 'admin@admin.com',
@@ -157,52 +142,19 @@ export const initializeAdmin = async (): Promise<void> => {
         emailVerified: true,
         createdAt: new Date().toISOString()
       })
-      
-      console.log('Admin user created successfully')
-      
       // Sign out the admin user after creation
       await signOut(auth)
-      
     } catch (authError: any) {
       if (authError.code === 'auth/email-already-in-use') {
-        console.log('Admin email already exists, verifying Firestore entry...')
-        
-        // Admin exists in Auth, let's sign in and check Firestore
-        try {
-          const signInResult = await signInWithEmailAndPassword(auth, 'admin@admin.com', '123456')
-          const existingAdminUser = signInResult.user
-          
-          // Now check if this user exists in Firestore (we're authenticated now)
-          const existingAdminDoc = await getDoc(doc(db, 'users', existingAdminUser.uid))
-          
-          if (!existingAdminDoc.exists()) {
-            // User exists in Auth but not in Firestore, add them
-            await setDoc(doc(db, 'users', existingAdminUser.uid), {
-              name: 'admin',
-              email: 'admin@admin.com',
-              role: 'admin',
-              emailVerified: true,
-              createdAt: new Date().toISOString()
-            })
-            console.log('Admin user added to Firestore successfully')
-          } else {
-            console.log('Admin user already exists in Firestore')
-          }
-          
-          // Sign out the admin user
-          await signOut(auth)
-          
-        } catch (signInError: any) {
-          console.error('Failed to verify admin in Firestore:', signInError.message)
-        }
+        console.log('Admin already exists - no action needed')
+        return
       } else {
-        console.error('Failed to create admin user:', authError.message)
+        console.error('Failed to create admin user:', authError.code, authError.message)
       }
     }
-    
+
   } catch (error: any) {
-    // Only log errors, not routine checks
-    console.error('Admin initialization failed:', error.message)
+    console.error('Admin initialization failed:', error.code, error.message)
   }
 }
 
@@ -210,7 +162,7 @@ export const initializeAdmin = async (): Promise<void> => {
 export const signupUser = (signupData: SignupData) => async (dispatch: AppDispatch) => {
   dispatch(setLoading(true))
   dispatch(setError(null))
-  
+
   try {
     if (!isFirebaseReady() || !auth || !db) {
       throw new Error('Firebase services not available. Please try again later.')
@@ -222,11 +174,11 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
 
     // Create user in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(
-      auth, 
-      signupData.email, 
+      auth,
+      signupData.email,
       signupData.password
     )
-    
+
     const user = userCredential.user
     console.log('User created successfully in Auth, UID:', user.uid)
 
@@ -244,17 +196,17 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
     // Send email verification
     try {
       console.log('Sending email verification to:', user.email)
-      
+
       // Send email verification with proper configuration
       await sendEmailVerification(user, {
         url: `${window.location.origin}/verify-success`,
         handleCodeInApp: true,
       })
-      
+
       console.log('Email verification sent successfully')
     } catch (emailError: any) {
       console.error('Email verification failed:', emailError.code, emailError.message)
-      
+
       // Try without custom URL as fallback
       try {
         console.log('Retrying email verification without custom URL...')
@@ -262,7 +214,7 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
         console.log('Email verification sent successfully (fallback)')
       } catch (fallbackError: any) {
         console.error('Email verification fallback also failed:', fallbackError.code, fallbackError.message)
-        
+
         // Log specific error codes for debugging
         if (fallbackError.code === 'auth/too-many-requests') {
           console.error('Too many email verification requests. Please wait before trying again.')
@@ -271,21 +223,21 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
         } else if (fallbackError.code === 'auth/user-disabled') {
           console.error('User account has been disabled.')
         }
-        
+
         // Don't fail the signup, but inform the user
         console.warn('Email verification could not be sent, but account was created successfully')
       }
     }
-    
+
     dispatch(setLoading(false))
     return { success: true, message: 'Account created! Please check your email to verify your account.' }
-    
+
   } catch (error: any) {
     console.error('Signup failed:', error.code, error.message)
     console.error('Full error object:', error)
-    
+
     let errorMessage = error.message
-    
+
     // Provide more user-friendly error messages
     if (error.code === 'auth/email-already-in-use') {
       errorMessage = 'An account with this email already exists.'
@@ -308,7 +260,7 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
     } else if (error.code === 'unavailable') {
       errorMessage = 'Service temporarily unavailable. Please try again in a few moments.'
     }
-    
+
     dispatch(setError(errorMessage))
     dispatch(setLoading(false))
     return { success: false, message: errorMessage }
@@ -319,7 +271,7 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
 export const loginUser = (email: string, password: string) => async (dispatch: AppDispatch) => {
   dispatch(setLoading(true))
   dispatch(setError(null))
-  
+
   try {
     if (!isFirebaseReady() || !auth || !db) {
       throw new Error('Firebase services not available. Please try again later.')
@@ -327,27 +279,27 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
 
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const firebaseUser = userCredential.user
-    
+
     // Get user data from Firestore first to check role
     const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-    
+
     if (!userDoc.exists()) {
       dispatch(setError('User data not found'))
       dispatch(setLoading(false))
       return { success: false, message: 'User data not found' }
     }
-    
+
     const userData = userDoc.data()
-    
+
     // Admin users can login without email verification
     if (userData.role !== 'admin' && !firebaseUser.emailVerified) {
       dispatch(setError('Please verify your email before logging in'))
       dispatch(setLoading(false))
       return { success: false, message: 'Please verify your email before logging in' }
     }
-    
+
     const token = await firebaseUser.getIdToken()
-    
+
     const user: User = {
       uid: firebaseUser.uid,
       name: userData.name,
@@ -355,18 +307,18 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
       role: userData.role,
       emailVerified: firebaseUser.emailVerified
     }
-    
+
     // Store in Redux and localStorage
     dispatch(setUser({ user, token }))
     localStorage.setItem('authToken', token)
     localStorage.setItem('user', JSON.stringify(user))
-    
+
     dispatch(setLoading(false))
     return { success: true, user }
-    
+
   } catch (error: any) {
     let errorMessage = error.message
-    
+
     if (error.code === 'auth/user-not-found') {
       errorMessage = 'No account found with this email address.'
     } else if (error.code === 'auth/wrong-password') {
@@ -376,7 +328,7 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
     } else if (error.code === 'auth/network-request-failed') {
       errorMessage = 'Network error. Please check your internet connection and try again.'
     }
-    
+
     dispatch(setError(errorMessage))
     dispatch(setLoading(false))
     return { success: false, message: errorMessage }
@@ -401,32 +353,87 @@ export const logoutUser = () => async (dispatch: AppDispatch) => {
 export const resendEmailVerification = () => async (dispatch: AppDispatch) => {
   dispatch(setLoading(true))
   dispatch(setError(null))
-  
+
   try {
     if (!auth || !auth.currentUser) {
       throw new Error('No user is currently signed in')
     }
 
     console.log('Resending email verification to:', auth.currentUser.email)
-    
+
     await sendEmailVerification(auth.currentUser, {
       url: `${window.location.origin}/verify-success`,
       handleCodeInApp: true,
     })
-    
+
     console.log('Verification email resent successfully')
     dispatch(setLoading(false))
     return { success: true, message: 'Verification email sent successfully' }
   } catch (error: any) {
     console.error('Resend email verification error:', error.code, error.message)
-    
+
     let errorMessage = error.message
     if (error.code === 'auth/too-many-requests') {
       errorMessage = 'Too many requests. Please wait a few minutes before requesting another verification email.'
     } else if (error.code === 'auth/user-not-found') {
       errorMessage = 'User not found. Please sign up again.'
     }
-    
+
+    dispatch(setError(errorMessage))
+    dispatch(setLoading(false))
+    return { success: false, message: errorMessage }
+  }
+}
+
+// Resend email verification by email (for verify-email page)
+export const resendEmailVerificationByEmail = (email: string, password: string) => async (dispatch: AppDispatch) => {
+  dispatch(setLoading(true))
+  dispatch(setError(null))
+
+  try {
+    if (!isFirebaseReady() || !auth || !db) {
+      throw new Error('Firebase services not available. Please try again later.')
+    }
+
+    console.log('Attempting to resend verification email for:', email)
+
+    // We need to temporarily sign in the user to send verification email
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const user = userCredential.user
+
+    if (user.emailVerified) {
+      // User is already verified, redirect them
+      dispatch(setLoading(false))
+      return { success: false, message: 'Email is already verified. You can now log in.' }
+    }
+
+    // Send verification email
+    await sendEmailVerification(user, {
+      url: `${window.location.origin}/verify-success`,
+      handleCodeInApp: true,
+    })
+
+    // Sign out the user after sending verification
+    await signOut(auth)
+
+    console.log('Verification email resent successfully')
+    dispatch(setLoading(false))
+    return { success: true, message: 'Verification email sent successfully' }
+
+  } catch (error: any) {
+    console.error('Resend email verification error:', error.code, error.message)
+
+    let errorMessage = error.message
+    if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many requests. Please wait a few minutes before requesting another verification email.'
+    } else if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with this email address.'
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Incorrect password. Please try again.'
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Please enter a valid email address.'
+    }
+
     dispatch(setError(errorMessage))
     dispatch(setLoading(false))
     return { success: false, message: errorMessage }
@@ -440,7 +447,7 @@ export const checkAuthState = () => async (dispatch: AppDispatch) => {
 
   const token = localStorage.getItem('authToken')
   const userStr = localStorage.getItem('user')
-  
+
   if (token && userStr) {
     try {
       const user = JSON.parse(userStr)
@@ -450,17 +457,17 @@ export const checkAuthState = () => async (dispatch: AppDispatch) => {
       localStorage.removeItem('user')
     }
   }
-  
+
   // Listen to auth state changes
   onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
     if (firebaseUser && firebaseUser.emailVerified && db) {
       try {
         // Get user data from Firestore
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        
+
         if (userDoc.exists()) {
           const userData = userDoc.data()
-          
+
           // Update emailVerified status in Firestore if needed
           if (!userData.emailVerified) {
             await setDoc(doc(db, 'users', firebaseUser.uid), {
@@ -469,9 +476,9 @@ export const checkAuthState = () => async (dispatch: AppDispatch) => {
               verifiedAt: new Date().toISOString()
             }, { merge: true })
           }
-          
+
           const token = await firebaseUser.getIdToken()
-          
+
           const user: User = {
             uid: firebaseUser.uid,
             name: userData.name,
@@ -479,7 +486,7 @@ export const checkAuthState = () => async (dispatch: AppDispatch) => {
             role: userData.role,
             emailVerified: firebaseUser.emailVerified
           }
-          
+
           dispatch(setUser({ user, token }))
           localStorage.setItem('authToken', token)
           localStorage.setItem('user', JSON.stringify(user))

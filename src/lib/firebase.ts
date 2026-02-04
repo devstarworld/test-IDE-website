@@ -46,8 +46,6 @@ try {
   }
   
   console.log('Firebase initialized successfully');
-  console.log('Project ID:', firebaseConfig.projectId);
-  console.log('Auth Domain:', firebaseConfig.authDomain);
 } catch (error) {
   console.error('Firebase initialization error:', error);
 }
