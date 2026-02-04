@@ -5,7 +5,10 @@ import {
   signOut,
   onAuthStateChanged,
   User as FirebaseUser,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup
 } from 'firebase/auth'
 import {
   doc,
@@ -410,6 +413,156 @@ export const sendPasswordReset = async (email: string): Promise<{ success: boole
       errorMessage = 'Too many requests. Please wait a few minutes before trying again.'
     }
     
+    return { success: false, message: errorMessage }
+  }
+}
+
+// Google Sign In
+export const signInWithGoogle = () => async (dispatch: AppDispatch) => {
+  dispatch(setLoading(true))
+  dispatch(setError(null))
+  
+  try {
+    if (!isFirebaseReady() || !auth || !db) {
+      throw new Error('Firebase services not available. Please try again later.')
+    }
+
+    const provider = new GoogleAuthProvider()
+    const result = await signInWithPopup(auth, provider)
+    const firebaseUser = result.user
+
+    console.log('Google sign in successful:', firebaseUser.email)
+
+    // Check if user exists in Firestore
+    let userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+    
+    if (!userDoc.exists()) {
+      // Create new user in Firestore
+      const userData = {
+        name: firebaseUser.displayName || 'Google User',
+        email: firebaseUser.email || '',
+        role: 'user',
+        emailVerified: firebaseUser.emailVerified,
+        createdAt: new Date().toISOString(),
+        provider: 'google'
+      }
+      
+      await setDoc(doc(db, 'users', firebaseUser.uid), userData)
+      console.log('New Google user created in Firestore')
+    }
+
+    // Get updated user data
+    userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+    const userData = userDoc.data()!
+
+    const token = await firebaseUser.getIdToken()
+    
+    const user: User = {
+      uid: firebaseUser.uid,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+      emailVerified: firebaseUser.emailVerified
+    }
+
+    // Store in Redux and localStorage
+    dispatch(setUser({ user, token }))
+    localStorage.setItem('authToken', token)
+    localStorage.setItem('user', JSON.stringify(user))
+
+    dispatch(setLoading(false))
+    return { success: true, user }
+
+  } catch (error: any) {
+    console.error('Google sign in error:', error.code, error.message)
+    
+    let errorMessage = error.message
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Sign in was cancelled.'
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Popup was blocked by your browser. Please allow popups and try again.'
+    } else if (error.code === 'auth/network-request-failed') {
+      errorMessage = 'Network error. Please check your internet connection and try again.'
+    }
+
+    dispatch(setError(errorMessage))
+    dispatch(setLoading(false))
+    return { success: false, message: errorMessage }
+  }
+}
+
+// GitHub Sign In
+export const signInWithGitHub = () => async (dispatch: AppDispatch) => {
+  dispatch(setLoading(true))
+  dispatch(setError(null))
+  
+  try {
+    if (!isFirebaseReady() || !auth || !db) {
+      throw new Error('Firebase services not available. Please try again later.')
+    }
+
+    const provider = new GithubAuthProvider()
+    const result = await signInWithPopup(auth, provider)
+    const firebaseUser = result.user
+
+    console.log('GitHub sign in successful:', firebaseUser.email)
+
+    // Check if user exists in Firestore
+    let userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+    
+    if (!userDoc.exists()) {
+      // Create new user in Firestore
+      const userData = {
+        name: firebaseUser.displayName || 'GitHub User',
+        email: firebaseUser.email || '',
+        role: 'user',
+        emailVerified: firebaseUser.emailVerified,
+        createdAt: new Date().toISOString(),
+        provider: 'github'
+      }
+      
+      await setDoc(doc(db, 'users', firebaseUser.uid), userData)
+      console.log('New GitHub user created in Firestore')
+    }
+
+    // Get updated user data
+    userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+    const userData = userDoc.data()!
+
+    const token = await firebaseUser.getIdToken()
+    
+    const user: User = {
+      uid: firebaseUser.uid,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+      emailVerified: firebaseUser.emailVerified
+    }
+
+    // Store in Redux and localStorage
+    dispatch(setUser({ user, token }))
+    localStorage.setItem('authToken', token)
+    localStorage.setItem('user', JSON.stringify(user))
+
+    dispatch(setLoading(false))
+    return { success: true, user }
+
+  } catch (error: any) {
+    console.error('GitHub sign in error:', error.code, error.message)
+    
+    let errorMessage = error.message
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Sign in was cancelled.'
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Popup was blocked by your browser. Please allow popups and try again.'
+    } else if (error.code === 'auth/account-exists-with-different-credential') {
+      errorMessage = 'An account already exists with the same email address but different sign-in credentials.'
+    } else if (error.code === 'auth/network-request-failed') {
+      errorMessage = 'Network error. Please check your internet connection and try again.'
+    }
+
+    dispatch(setError(errorMessage))
+    dispatch(setLoading(false))
     return { success: false, message: errorMessage }
   }
 }
