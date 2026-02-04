@@ -6,52 +6,30 @@ import { checkAuthState, initializeAdmin } from '@/actions/authActions'
 
 export default function AppInitializer() {
   const dispatch = useAppDispatch()
-  const [initialized, setInitialized] = useState(false)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (hasInitialized) return
+    
     const initializeApp = async () => {
-      if (initialized) return
-      
       try {
-        console.log('Initializing app...')
-        
         // Check authentication state first
         dispatch(checkAuthState())
         
-        // Wait for Firebase to be ready, then initialize admin
-        let retries = 0
-        const maxRetries = 5
+        // Initialize admin only once when app starts
+        await initializeAdmin()
         
-        const tryInitializeAdmin = async () => {
-          try {
-            await initializeAdmin()
-            console.log('Admin initialization completed')
-            setInitialized(true)
-          } catch (error: any) {
-            console.error('Admin initialization failed:', error)
-            
-            if (retries < maxRetries) {
-              retries++
-              console.log(`Retrying admin initialization (${retries}/${maxRetries})...`)
-              setTimeout(tryInitializeAdmin, 3000) // Wait 3 seconds before retry
-            } else {
-              console.error('Admin initialization failed after all retries')
-              setInitialized(true) // Mark as initialized to prevent infinite retries
-            }
-          }
-        }
-        
-        // Start admin initialization after a short delay
-        setTimeout(tryInitializeAdmin, 2000)
+        setHasInitialized(true)
         
       } catch (error) {
         console.error('App initialization error:', error)
-        setInitialized(true)
+        setHasInitialized(true) // Mark as initialized even on error to prevent retries
       }
     }
 
     initializeApp()
-  }, [dispatch, initialized])
+  }, [dispatch, hasInitialized])
 
   return null // This component doesn't render anything
 }

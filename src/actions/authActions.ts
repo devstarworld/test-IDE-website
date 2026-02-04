@@ -127,11 +127,19 @@ export const initializeAdmin = async (): Promise<void> => {
   try {
     // Check if Firebase services are ready
     if (!isFirebaseReady() || !auth || !db) {
-      console.error('Firebase services not initialized')
-      return
+      return // Silent return - no logging for service readiness
     }
 
-    console.log('Initializing admin user...')
+    // First check if users collection has any data
+    const usersRef = collection(db, 'users')
+    const usersSnapshot = await getDocs(usersRef)
+    
+    // If users collection is not empty, don't initialize admin
+    if (!usersSnapshot.empty) {
+      return // Silent return - users exist, no need for admin initialization
+    }
+    
+    console.log('Users collection is empty, initializing admin user...')
     
     // Try to create admin user in Firebase Auth first
     try {
@@ -140,8 +148,6 @@ export const initializeAdmin = async (): Promise<void> => {
         'admin@admin.com',
         '123456'
       )
-      
-      console.log('Admin user created in Auth, adding to Firestore...')
       
       // Now that we have an authenticated user, add to Firestore
       await setDoc(doc(db, 'users', adminCredential.user.uid), {
@@ -195,13 +201,8 @@ export const initializeAdmin = async (): Promise<void> => {
     }
     
   } catch (error: any) {
+    // Only log errors, not routine checks
     console.error('Admin initialization failed:', error.message)
-    
-    // Provide specific guidance for permission errors
-    if (error.message.includes('Missing or insufficient permissions')) {
-      console.error('Firestore security rules are blocking admin creation.')
-      console.error('Please update your Firestore rules to allow authenticated users to write to the users collection.')
-    }
   }
 }
 
