@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useFirebase } from '@/contexts/FirebaseContext'
 import { signupUser, testFirebaseConnectivity } from '@/actions/authActions'
 
 export default function SignupPage() {
@@ -16,32 +17,11 @@ export default function SignupPage() {
   })
   const [showModal, setShowModal] = useState(false)
   const [errors, setErrors] = useState<{[key: string]: string}>({})
-  const [firebaseReady, setFirebaseReady] = useState(false)
   
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
+  const { firebaseReady, loading: firebaseLoading } = useFirebase()
   const router = useRouter()
-
-  useEffect(() => {
-    // Check if Firebase is ready
-    const checkFirebase = async () => {
-      try {
-        // Import Firebase to check if it's available
-        const { auth, db } = await import('@/lib/firebase')
-        if (auth && db) {
-          setFirebaseReady(true)
-        } else {
-          console.error('Firebase services not available')
-          setFirebaseReady(false)
-        }
-      } catch (error) {
-        console.error('Firebase initialization error:', error)
-        setFirebaseReady(false)
-      }
-    }
-    
-    checkFirebase()
-  }, [])
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {}
@@ -125,12 +105,43 @@ export default function SignupPage() {
            Object.keys(errors).length === 0
   }
 
+  // Show loading while Firebase is initializing
+  if (firebaseLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 mb-2">Initializing Firebase...</p>
+          <p className="text-sm text-gray-500">
+            If this takes too long, please check your internet connection and Firebase configuration.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error if Firebase failed to initialize
   if (!firebaseReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Initializing Firebase...</p>
+        <div className="text-center max-w-md">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Firebase Connection Failed
+          </h3>
+          <p className="text-sm text-gray-600 mb-6">
+            Unable to connect to Firebase services. Please check your internet connection and try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn-primary text-white font-medium py-2 px-4 rounded-md"
+          >
+            Retry
+          </button>
         </div>
       </div>
     )

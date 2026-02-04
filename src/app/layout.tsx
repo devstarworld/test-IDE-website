@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Manrope } from 'next/font/google'
 import './globals.css'
 import ReduxProvider from '@/store/ReduxProvider'
+import { FirebaseProvider } from '@/contexts/FirebaseContext'
 import AppInitializer from '@/components/AppInitializer'
 
 const inter = Inter({ 
@@ -72,8 +73,10 @@ export default function RootLayout({
       </head>
       <body className={`min-h-screen bg-background font-sans antialiased ${inter.className}`}>
         <ReduxProvider>
-          <AppInitializer />
-          {children}
+          <FirebaseProvider>
+            <AppInitializer />
+            {children}
+          </FirebaseProvider>
         </ReduxProvider>
       </body>
     </html>

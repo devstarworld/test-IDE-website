@@ -2,16 +2,17 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
 
 interface FirebaseContextType {
   user: User | null
   loading: boolean
+  firebaseReady: boolean
 }
 
 const FirebaseContext = createContext<FirebaseContextType>({
   user: null,
-  loading: true
+  loading: true,
+  firebaseReady: false
 })
 
 export const useFirebase = () => {
@@ -29,25 +30,44 @@ interface FirebaseProviderProps {
 export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [firebaseReady, setFirebaseReady] = useState(false)
 
   useEffect(() => {
-    if (!auth) {
-      console.error('Firebase Auth not initialized')
-      setLoading(false)
-      return
+    const checkFirebaseReady = async () => {
+      try {
+        // Check if Firebase services are available
+        const { auth: firebaseAuth, db } = await import('@/lib/firebase')
+        
+        if (firebaseAuth && db) {
+          console.log('Firebase services ready')
+          setFirebaseReady(true)
+          
+          // Set up auth state listener
+          const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+            setUser(user)
+            setLoading(false)
+          })
+
+          return () => unsubscribe()
+        } else {
+          console.error('Firebase services not available')
+          setFirebaseReady(false)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Firebase initialization error:', error)
+        setFirebaseReady(false)
+        setLoading(false)
+      }
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
+    checkFirebaseReady()
   }, [])
 
   const value = {
     user,
-    loading
+    loading,
+    firebaseReady
   }
 
   return (

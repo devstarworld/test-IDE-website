@@ -327,13 +327,7 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const firebaseUser = userCredential.user
     
-    if (!firebaseUser.emailVerified) {
-      dispatch(setError('Please verify your email before logging in'))
-      dispatch(setLoading(false))
-      return { success: false, message: 'Please verify your email before logging in' }
-    }
-    
-    // Get user data from Firestore
+    // Get user data from Firestore first to check role
     const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
     
     if (!userDoc.exists()) {
@@ -343,6 +337,14 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
     }
     
     const userData = userDoc.data()
+    
+    // Admin users can login without email verification
+    if (userData.role !== 'admin' && !firebaseUser.emailVerified) {
+      dispatch(setError('Please verify your email before logging in'))
+      dispatch(setLoading(false))
+      return { success: false, message: 'Please verify your email before logging in' }
+    }
+    
     const token = await firebaseUser.getIdToken()
     
     const user: User = {

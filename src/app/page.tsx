@@ -1,11 +1,13 @@
-import Navbar from '@/components/Navbar/Navbar'
-import HeroSection from '@/components/HeroSection/HeroSection'
-import VideoSection from '@/components/VideoSection/VideoSection'
-import FeaturesSection from '@/components/FeaturesSection/FeaturesSection'
-import IntegrationsSection from '@/components/IntegrationsSection/IntegrationsSection'
-import CTASection from '@/components/CTASection/CTASection'
-import Footer from '@/components/Footer/Footer'
-import BackgroundAnimation from '@/components/BackgroundAnimation/BackgroundAnimation'
+import {
+  Navbar,
+  HeroSection,
+  VideoSection,
+  FeaturesSection,
+  IntegrationsSection,
+  CTASection,
+  Footer,
+  BackgroundAnimation
+} from '@/components'
 
 export default function Home() {
   return (
