@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, Manrope } from 'next/font/google'
 import './globals.css'
-import { FirebaseProvider } from '@/contexts/FirebaseContext'
+import ReduxProvider from '@/store/ReduxProvider'
+import AppInitializer from '@/components/AppInitializer'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -70,9 +71,10 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/images/footer-gradient.webp" />
       </head>
       <body className={`min-h-screen bg-background font-sans antialiased ${inter.className}`}>
-        <FirebaseProvider>
+        <ReduxProvider>
+          <AppInitializer />
           {children}
-        </FirebaseProvider>
+        </ReduxProvider>
       </body>
     </html>
   )

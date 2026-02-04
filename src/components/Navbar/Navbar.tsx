@@ -1,9 +1,23 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useAppSelector, useAppDispatch } from '@/store/hooks'
+import { checkAuthState, logoutUser } from '@/actions/authActions'
 
 export default function Navbar() {
+  const { user, isLoading } = useAppSelector((state) => state.auth)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(checkAuthState())
+  }, [dispatch])
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser())
+  }
+
   return (
     <header className="sticky top-4 z-50 flex justify-center px-4">
       <div className="border backdrop-blur-lg bg-background/40 rounded-2xl transition-all duration-500 ease-out w-full max-w-7xl">
@@ -42,6 +56,14 @@ export default function Navbar() {
               >
                 About Us
               </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Admin
+                </Link>
+              )}
             </nav>
 
             <div className="flex items-center gap-4">
@@ -68,18 +90,41 @@ export default function Navbar() {
                 </a>
               </div>
               
-              <Link
-                href="/login"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Sign In
-              </Link>
-              
-              <Link href="/signup">
-                <button className="btn-primary text-sm h-8 px-3 py-1">
-                  Sign Up
-                </button>
-              </Link>
+              {!isLoading && (
+                <>
+                  {user ? (
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href="/account"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Account
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Sign In
+                      </Link>
+                      
+                      <Link href="/signup">
+                        <button className="btn-primary text-sm h-8 px-3 py-1">
+                          Sign Up
+                        </button>
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -31,6 +31,12 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!auth) {
+      console.error('Firebase Auth not initialized')
+      setLoading(false)
+      return
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
       setLoading(false)
