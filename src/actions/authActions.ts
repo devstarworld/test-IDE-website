@@ -4,7 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  User as FirebaseUser
+  User as FirebaseUser,
+  sendPasswordResetEmail
 } from 'firebase/auth'
 import {
   doc,
@@ -338,16 +339,26 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
     return { success: true, user }
 
   } catch (error: any) {
+    console.error('Login error:', error.code, error.message)
     let errorMessage = error.message
 
-    if (error.code === 'auth/user-not-found') {
+    // Firebase now uses auth/invalid-credential for both wrong email and wrong password
+    if (error.code === 'auth/invalid-credential') {
+      errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+    } else if (error.code === 'auth/user-not-found') {
       errorMessage = 'No account found with this email address.'
     } else if (error.code === 'auth/wrong-password') {
       errorMessage = 'Incorrect password.'
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Please enter a valid email address.'
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many failed login attempts. Please try again later or reset your password.'
+    } else if (error.code === 'auth/user-disabled') {
+      errorMessage = 'This account has been disabled. Please contact support.'
     } else if (error.code === 'auth/network-request-failed') {
       errorMessage = 'Network error. Please check your internet connection and try again.'
+    } else if (error.code === 'auth/configuration-not-found') {
+      errorMessage = 'Incorrect configuration. Please contact support.'
     }
 
     dispatch(setError(errorMessage))
@@ -367,6 +378,39 @@ export const logoutUser = () => async (dispatch: AppDispatch) => {
     localStorage.removeItem('user')
   } catch (error: any) {
     dispatch(setError(error.message))
+  }
+}
+
+// Forgot password - send password reset email
+export const sendPasswordReset = async (email: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    if (!isFirebaseReady() || !auth) {
+      throw new Error('Firebase services not available. Please try again later.')
+    }
+
+    console.log('Sending password reset email to:', email)
+    
+    await sendPasswordResetEmail(auth, email)
+    
+    console.log('Password reset email sent successfully')
+    return { 
+      success: true, 
+      message: 'Password reset email sent! Please check your inbox.' 
+    }
+    
+  } catch (error: any) {
+    console.error('Password reset error:', error.code, error.message)
+    
+    let errorMessage = error.message
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with this email address.'
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Please enter a valid email address.'
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many requests. Please wait a few minutes before trying again.'
+    }
+    
+    return { success: false, message: errorMessage }
   }
 }
 

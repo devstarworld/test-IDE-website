@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { loginUser } from '@/actions/authActions'
+import { loginUser, sendPasswordReset } from '@/actions/authActions'
+import { setError } from '@/store/slices/authSlice'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -13,10 +14,19 @@ export default function LoginPage() {
     password: ''
   })
   const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetMessage, setResetMessage] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
   
   const dispatch = useAppDispatch()
   const { isLoading, error, user } = useAppSelector((state) => state.auth)
   const router = useRouter()
+
+  // Clear errors when component mounts
+  useEffect(() => {
+    dispatch(setError(null))
+  }, [dispatch])
 
   useEffect(() => {
     if (user) {
@@ -57,7 +67,7 @@ export default function LoginPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (!validateForm()) {
@@ -72,6 +82,42 @@ export default function LoginPage() {
       // User needs to verify email, redirect to verify-email page
       router.push(`/verify-email?email=${encodeURIComponent(result.email || formData.email)}`)
     }
+  }
+
+  const handleForgotPassword = async () => {
+    // Validate email
+    if (!resetEmail.trim()) {
+      setResetMessage('Please enter your email address')
+      return
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(resetEmail)) {
+      setResetMessage('Please enter a valid email address')
+      return
+    }
+
+    setResetLoading(true)
+    setResetMessage('')
+    
+    const result = await sendPasswordReset(resetEmail)
+    
+    setResetLoading(false)
+    setResetMessage(result.message)
+    
+    if (result.success) {
+      // Clear the email field and close modal after 3 seconds
+      setTimeout(() => {
+        setShowForgotPassword(false)
+        setResetEmail('')
+        setResetMessage('')
+      }, 3000)
+    }
+  }
+
+  const handleOpenForgotPassword = () => {
+    setShowForgotPassword(true)
+    setResetEmail(formData.email) // Pre-fill with login email if available
+    setResetMessage('')
   }
 
   return (
@@ -169,16 +215,80 @@ export default function LoginPage() {
             </div>
 
             <div className="text-center">
-              <Link
-                href="/forgot-password"
+              <button
+                type="button"
+                onClick={handleOpenForgotPassword}
                 className="text-sm text-primary hover:text-primary/80"
               >
                 Forgot your password?
-              </Link>
+              </button>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Reset Your Password
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Enter your email address and we'll send you a link to reset your password.
+              </p>
+              
+              <div className="mb-4">
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                />
+              </div>
+
+              {resetMessage && (
+                <div className={`mb-4 p-3 rounded-md ${
+                  resetMessage.includes('sent') 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-red-50 border border-red-200'
+                }`}>
+                  <p className={`text-sm ${
+                    resetMessage.includes('sent') 
+                      ? 'text-green-600' 
+                      : 'text-red-600'
+                  }`}>
+                    {resetMessage}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleForgotPassword}
+                  disabled={resetLoading}
+                  className="flex-1 bg-primary text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+                >
+                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowForgotPassword(false)
+                    setResetEmail('')
+                    setResetMessage('')
+                  }}
+                  disabled={resetLoading}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
