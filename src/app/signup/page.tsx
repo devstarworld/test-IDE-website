@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useFirebase } from '@/contexts/FirebaseContext'
 import { signupUser, testFirebaseConnectivity } from '@/actions/authActions'
+import { setError } from '@/store/slices/authSlice'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,11 @@ export default function SignupPage() {
   const { isLoading, error } = useAppSelector((state) => state.auth)
   const { firebaseReady, loading: firebaseLoading } = useFirebase()
   const router = useRouter()
+
+  // Clear any existing errors when the component mounts
+  useEffect(() => {
+    dispatch(setError(null))
+  }, [dispatch])
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {}

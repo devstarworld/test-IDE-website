@@ -68,6 +68,9 @@ export default function LoginPage() {
 
     if (result.success) {
       router.push('/account')
+    } else if (result.needsVerification) {
+      // User needs to verify email, redirect to verify-email page
+      router.push(`/verify-email?email=${encodeURIComponent(result.email || formData.email)}`)
     }
   }
 

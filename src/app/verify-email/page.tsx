@@ -20,7 +20,7 @@ export default function VerifyEmailPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  // Get email from URL params (passed from signup)
+  // Get email from URL params (passed from signup or login)
   const email = searchParams.get('email') || ''
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function VerifyEmailPage() {
             Verify Your Email
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            We've sent a verification link to your email address
+            A verification link has been sent to your email address
           </p>
         </div>
 

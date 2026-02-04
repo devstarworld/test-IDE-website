@@ -293,9 +293,30 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
 
     // Admin users can login without email verification
     if (userData.role !== 'admin' && !firebaseUser.emailVerified) {
-      dispatch(setError('Please verify your email before logging in'))
+      console.log('User email not verified, sending verification email...')
+      
+      // Send verification email
+      try {
+        await sendEmailVerification(firebaseUser, {
+          url: `${window.location.origin}/verify-success`,
+          handleCodeInApp: true,
+        })
+        console.log('Verification email sent successfully')
+      } catch (emailError: any) {
+        console.error('Failed to send verification email:', emailError.code, emailError.message)
+        // Continue even if email sending fails
+      }
+      
+      // Sign out the user since they can't proceed without verification
+      await signOut(auth)
+      
       dispatch(setLoading(false))
-      return { success: false, message: 'Please verify your email before logging in' }
+      return { 
+        success: false, 
+        message: 'Please verify your email before logging in',
+        needsVerification: true,
+        email: firebaseUser.email || email
+      }
     }
 
     const token = await firebaseUser.getIdToken()
