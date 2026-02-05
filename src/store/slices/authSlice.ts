@@ -6,6 +6,9 @@ interface User {
   email: string
   role: 'user' | 'admin'
   emailVerified: boolean
+  membership: 'free' | 'pro' | 'premium'
+  memberSince: string
+  creditUsage: number
 }
 
 interface AuthState {
@@ -47,8 +50,14 @@ const authSlice = createSlice({
         state.user.emailVerified = action.payload
       }
     },
+    updateMembership: (state, action: PayloadAction<{ membership: 'free' | 'pro' | 'premium'; memberSince: string }>) => {
+      if (state.user) {
+        state.user.membership = action.payload.membership
+        state.user.memberSince = action.payload.memberSince
+      }
+    },
   },
 })
 
-export const { setLoading, setError, setUser, clearUser, updateEmailVerified } = authSlice.actions
+export const { setLoading, setError, setUser, clearUser, updateEmailVerified, updateMembership } = authSlice.actions
 export default authSlice.reducer

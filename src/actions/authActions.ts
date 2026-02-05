@@ -31,6 +31,9 @@ interface User {
   email: string
   role: 'user' | 'admin'
   emailVerified: boolean
+  membership: 'free' | 'pro' | 'premium'
+  memberSince: string
+  creditUsage: number
 }
 
 // Check if Firebase services are available
@@ -193,6 +196,9 @@ export const signupUser = (signupData: SignupData) => async (dispatch: AppDispat
       email: signupData.email,
       role: 'user',
       emailVerified: false,
+      membership: 'free',
+      memberSince: new Date().toISOString(),
+      creditUsage: 0,
       createdAt: new Date().toISOString()
     })
     console.log('User data stored in Firestore successfully')
@@ -330,7 +336,10 @@ export const loginUser = (email: string, password: string) => async (dispatch: A
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      emailVerified: firebaseUser.emailVerified
+      emailVerified: firebaseUser.emailVerified,
+      membership: userData.membership || 'free',
+      memberSince: userData.memberSince || new Date().toISOString(),
+      creditUsage: userData.creditUsage || 0
     }
 
     // Store in Redux and localStorage
@@ -443,6 +452,9 @@ export const signInWithGoogle = () => async (dispatch: AppDispatch) => {
         email: firebaseUser.email || '',
         role: 'user',
         emailVerified: true, // Google users are always verified
+        membership: 'free',
+        memberSince: new Date().toISOString(),
+        creditUsage: 0,
         createdAt: new Date().toISOString(),
         provider: 'google'
       }
@@ -462,7 +474,10 @@ export const signInWithGoogle = () => async (dispatch: AppDispatch) => {
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      emailVerified: true // Google users are always verified
+      emailVerified: true, // Google users are always verified
+      membership: userData.membership || 'free',
+      memberSince: userData.memberSince || new Date().toISOString(),
+      creditUsage: userData.creditUsage || 0
     }
 
     // Store in Redux and localStorage
@@ -517,6 +532,9 @@ export const signInWithGitHub = () => async (dispatch: AppDispatch) => {
         email: firebaseUser.email || '',
         role: 'user',
         emailVerified: true, // GitHub users are always verified
+        membership: 'free',
+        memberSince: new Date().toISOString(),
+        creditUsage: 0,
         createdAt: new Date().toISOString(),
         provider: 'github'
       }
@@ -536,7 +554,10 @@ export const signInWithGitHub = () => async (dispatch: AppDispatch) => {
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      emailVerified: true // GitHub users are always verified
+      emailVerified: true, // GitHub users are always verified
+      membership: userData.membership || 'free',
+      memberSince: userData.memberSince || new Date().toISOString(),
+      creditUsage: userData.creditUsage || 0
     }
 
     // Store in Redux and localStorage
@@ -702,7 +723,10 @@ export const checkAuthState = () => async (dispatch: AppDispatch) => {
             name: userData.name,
             email: userData.email,
             role: userData.role,
-            emailVerified: firebaseUser.emailVerified
+            emailVerified: firebaseUser.emailVerified,
+            membership: userData.membership || 'free',
+            memberSince: userData.memberSince || new Date().toISOString(),
+            creditUsage: userData.creditUsage || 0
           }
 
           dispatch(setUser({ user, token }))
