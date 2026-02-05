@@ -122,15 +122,6 @@ export default function SignupPage() {
     }
   }
 
-  const isFormValid = () => {
-    return formData.name.trim() &&
-      formData.email.trim() &&
-      formData.password &&
-      formData.confirmPassword &&
-      formData.password === formData.confirmPassword &&
-      Object.keys(errors).length === 0
-  }
-
   // Show loading while Firebase is initializing
   if (firebaseLoading) {
     return (

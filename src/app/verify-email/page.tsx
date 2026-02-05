@@ -1,37 +1,49 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { resendEmailVerificationByEmail } from '@/actions/authActions'
 
 export default function VerifyEmailPage() {
-  const [countdown, setCountdown] = useState(0)
-  const [canResend, setCanResend] = useState(true)
+  const [countdown, setCountdown] = useState(60) // Start with 60 seconds countdown
+  const [canResend, setCanResend] = useState(false) // Disable resend initially
   const [resendMessage, setResendMessage] = useState('')
   const [showPasswordField, setShowPasswordField] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [email, setEmail] = useState('')
   
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
   const router = useRouter()
-  const searchParams = useSearchParams()
   
-  // Get email from URL params (passed from signup or login)
-  const email = searchParams.get('email') || ''
+  // Get email from URL params on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const emailParam = urlParams.get('email') || ''
+      setEmail(emailParam)
+    }
+  }, [])
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
-    if (countdown > 0) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-    } else if (countdown === 0 && !canResend) {
-      setCanResend(true)
-    }
+    if (countdown <= 0) return
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          setCanResend(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
     return () => clearTimeout(timer)
-  }, [countdown, canResend])
+  }, [countdown])
 
   const handleResendEmail = async () => {
     if (!canResend || isLoading) return
