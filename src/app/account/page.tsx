@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { checkAuthState, logoutUser } from '@/actions/authActions'
 import PaymentModal from '@/components/PaymentModal/PaymentModal'
+import { StripedBackground } from '@/components'
+import { Download, Copy, User, Check } from 'lucide-react'
 
 export default function AccountPage() {
   const { user, isLoading } = useAppSelector((state) => state.auth)
@@ -12,6 +14,8 @@ export default function AccountPage() {
   const router = useRouter()
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | 'premium'>('pro')
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     dispatch(checkAuthState())
@@ -41,17 +45,61 @@ export default function AccountPage() {
     setIsPaymentModalOpen(true)
   }
 
+  const getButtonText = (plan: 'free' | 'pro' | 'premium') => {
+    if (!user) return null
+    
+    const currentPlan = user.membership
+    if (currentPlan === plan) return null
+
+    const planHierarchy: { [key: string]: number } = { free: 0, pro: 1, premium: 2 }
+    const isUpgrade = planHierarchy[plan] > planHierarchy[currentPlan]
+
+    if (plan === 'free') return 'Downgrade to Free'
+    if (plan === 'pro') return isUpgrade ? 'Upgrade to Pro' : 'Downgrade to Pro'
+    if (plan === 'premium') return 'Upgrade to Premium'
+    
+    return null
+  }
+
+  const shouldShowButton = (plan: 'free' | 'pro' | 'premium') => {
+    if (!user) return true
+    return user.membership !== plan
+  }
+
+  const getTotalCredits = (membership: string) => {
+    const credits = { free: 500, pro: 1000, premium: 10000 }
+    return credits[membership as keyof typeof credits] || 500
+  }
+
+  const getResetDate = () => {
+    if (!user) return ''
+    const memberDate = new Date(user.memberSince)
+    const nextMonth = new Date(memberDate)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    return nextMonth.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })
+  }
+
+  const handleCopyCurl = () => {
+    navigator.clipboard.writeText('curl -fsSL https://cli.zedai.dev/install | bash')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(0_0%_95.3%)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   if (!user) {
-    return null // Will redirect to login
+    return null
   }
+
+  const totalCredits = getTotalCredits(user.membership)
+  const usedCredits = user.creditUsage
+  const creditPercentage = Math.min((usedCredits / totalCredits) * 100, 100)
 
   return (
     <>
@@ -61,263 +109,279 @@ export default function AccountPage() {
         plan={selectedPlan}
         amount={getPlanAmount(selectedPlan)}
       />
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="border-b border-gray-200 pb-6 mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Account</h1>
-            <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* User Information */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md">
-                    {user.name}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md">
-                    {user.email}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md capitalize">
-                    {user.role}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Verification Status
-                  </label>
-                  <div className="flex items-center">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.emailVerified 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.emailVerified ? 'Verified' : 'Not Verified'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Membership
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md capitalize">
-                    {user.membership}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Member Since
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md">
-                    {new Date(user.memberSince).toLocaleDateString()}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Credit Usage
-                  </label>
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-md">
-                    {user.creditUsage} credits
-                  </p>
-                </div>
+      
+      <div className="min-h-screen bg-[hsl(0_0%_95.3%)] font-manrope">
+        {/* Navbar */}
+        <nav className="bg-gray-900 border-b border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-14">
+              <div className="text-blue-400 font-semibold text-sm">
               </div>
-            </div>
-
-            {/* Account Actions */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Account Actions</h2>
               
-              <div className="space-y-4">
+              <div className="relative">
                 <button
-                  onClick={handleLogout}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors text-sm"
                 >
-                  Sign Out
+                  <span className="text-gray-300">{user.email}</span>
                 </button>
 
-                {user.role === 'admin' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <h3 className="text-sm font-medium text-blue-900 mb-2">
-                      Admin Access
-                    </h3>
-                    <p className="text-sm text-blue-700 mb-3">
-                      You have administrator privileges on this account.
-                    </p>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded">
-                      Admin Dashboard
-                    </button>
-                  </div>
+                {showUserMenu && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setShowUserMenu(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-20">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </nav>
 
-        {/* Membership Plans Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mt-8">
-          <div className="border-b border-gray-200 pb-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Membership Plans</h2>
-            <p className="text-gray-600 mt-2">Upgrade or change your membership plan</p>
+        {/* Main Content */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Install Zedai Section */}
+          <StripedBackground className="p-6 sm:p-8 mb-6 border border-border/50">
+            <h2 className="text-xl font-semibold mb-4 flex items-center text-gray-900">
+              <Download className="w-5 h-5 mr-2" />
+              Install Zedai
+            </h2>
+            
+            <p className="text-gray-700 mb-4">
+              Install Zedai IDE using{' '}
+              <a href="#" className="text-blue-600 underline hover:text-blue-700">
+                IDE installation instructions
+              </a>
+            </p>
+            
+            <button
+              className="bg-purple-400 text-white px-6 py-2.5 rounded-lg font-medium mb-6 inline-flex items-center cursor-default"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Download for Windows
+            </button>
+            
+            <p className="text-gray-700 mb-3">
+              Install Zedai CLI in your terminal using{' '}
+              <a href="#" className="text-blue-600 underline hover:text-blue-700">
+                CLI installation instructions
+              </a>
+            </p>
+            
+            <div className="bg-purple-100 border border-purple-300 rounded-lg px-4 py-3 font-mono text-sm text-purple-900 inline-flex items-center">
+              <span className="select-all">curl -fsSL https://cli.zedai.dev/install | bash</span>
+              <button 
+                onClick={handleCopyCurl}
+                className="ml-3 text-purple-600 hover:text-purple-700 transition-colors"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </button>
+            </div>
+          </StripedBackground>
+
+          {/* User Info Section */}
+          <StripedBackground className="p-6 mb-6 border border-border/50">
+            <div className="flex items-start">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 flex-shrink-0">
+                <User className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{user.email}</h3>
+                <p className="text-sm text-gray-600">
+                  Signed in with GitHub | <a href="#" className="text-blue-600 hover:underline">UserID</a>
+                </p>
+              </div>
+            </div>
+          </StripedBackground>
+
+          {/* Estimated Usage Section */}
+          <StripedBackground className="p-6 mb-8 border border-border/50">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Estimated Usage</h3>
+                <p className="text-sm text-gray-600">resets on {getResetDate()}</p>
+              </div>
+              <span className="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-md text-sm font-medium">
+                Zedai {user.membership.charAt(0).toUpperCase() + user.membership.slice(1)}
+              </span>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-gray-700">Credits</span>
+                <span className="text-gray-600">{usedCredits} used / {totalCredits} covered in plan</span>
+              </div>
+              <div className="w-full bg-gray-300 rounded-full h-2">
+                <div 
+                  className="bg-gray-600 h-2 rounded-full transition-all" 
+                  style={{ width: `${creditPercentage}%` }}
+                />
+              </div>
+              <div className="text-right text-xs text-gray-500 mt-1">
+                {Math.round(creditPercentage)}%
+              </div>
+            </div>
+          </StripedBackground>
+
+          {/* Membership Plans */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Membership Plans
+            </h2>
+            <p className="text-gray-600">
+              Upgrade or change your membership plan
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Free Plan */}
-            <div className={`border rounded-lg p-6 ${
-              user.membership === 'free' ? 'border-2 border-green-500 bg-green-50' : 'border-gray-200'
+            <StripedBackground className={`p-8 border ${
+              user.membership === 'free' ? 'border-2 border-green-500' : 'border-border/50'
             }`}>
               {user.membership === 'free' && (
-                <div className="mb-4">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
                     Current Plan
                   </span>
                 </div>
               )}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Free</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold">$0</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Free</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-gray-900">$0</span>
                 <span className="text-gray-600">/month</span>
               </div>
-              <ul className="space-y-2 mb-6 text-sm">
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   500 credits
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   Basic AI assistance
                 </li>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Community support
+                </li>
               </ul>
-              {user.membership !== 'free' && (
+              {shouldShowButton('free') && (
                 <button
                   onClick={() => handlePlanAction('free')}
-                  className="w-full py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                 >
-                  Downgrade to Free
+                  {getButtonText('free')}
                 </button>
               )}
-            </div>
+            </StripedBackground>
 
             {/* Pro Plan */}
-            <div className={`border rounded-lg p-6 ${
-              user.membership === 'pro' ? 'border-2 border-primary bg-blue-50' : 'border-gray-200'
+            <StripedBackground className={`p-8 border relative ${
+              user.membership === 'pro' ? 'border-2 border-primary' : 'border-2 border-primary'
             }`}>
-              {user.membership === 'pro' && (
-                <div className="mb-4">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+              {user.membership === 'pro' ? (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
                     Current Plan
                   </span>
                 </div>
+              ) : (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
+                    Most Popular
+                  </span>
+                </div>
               )}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Pro</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold">$29</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pro</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-gray-900">$29</span>
                 <span className="text-gray-600">/month</span>
               </div>
-              <ul className="space-y-2 mb-6 text-sm">
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   1000 credits
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   Advanced AI agents
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   Priority support
                 </li>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Custom integrations
+                </li>
               </ul>
-              {user.membership !== 'pro' && (
+              {shouldShowButton('pro') && (
                 <button
                   onClick={() => handlePlanAction('pro')}
-                  className="w-full py-2 px-4 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90"
+                  className="btn-primary w-full py-2 px-4 rounded-md text-white font-medium transition-colors"
                 >
-                  {user.membership === 'free' ? 'Upgrade to Pro' : 'Downgrade to Pro'}
+                  {getButtonText('pro')}
                 </button>
               )}
-            </div>
+            </StripedBackground>
 
             {/* Premium Plan */}
-            <div className={`border rounded-lg p-6 ${
-              user.membership === 'premium' ? 'border-2 border-purple-500 bg-purple-50' : 'border-gray-200'
+            <StripedBackground className={`p-8 border relative ${
+              user.membership === 'premium' ? 'border-2 border-purple-500' : 'border-border/50'
             }`}>
               {user.membership === 'premium' && (
-                <div className="mb-4">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
                     Current Plan
                   </span>
                 </div>
               )}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Premium</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold">$99</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-gray-900">$99</span>
                 <span className="text-gray-600">/month</span>
               </div>
-              <ul className="space-y-2 mb-6 text-sm">
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   10000 credits
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Advanced AI agents
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   Dedicated support
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   On-premise deployment
                 </li>
+                <li className="flex items-center text-gray-700">
+                  <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  Custom SLA
+                </li>
               </ul>
-              {user.membership !== 'premium' && (
+              {shouldShowButton('premium') && (
                 <button
                   onClick={() => handlePlanAction('premium')}
-                  className="w-full py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                 >
-                  Upgrade to Premium
+                  {getButtonText('premium')}
                 </button>
               )}
-            </div>
+            </StripedBackground>
           </div>
         </div>
-      </div>
       </div>
     </>
   )
