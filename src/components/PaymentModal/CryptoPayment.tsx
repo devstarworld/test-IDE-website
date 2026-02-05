@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAppSelector } from '@/store/hooks'
+import { calculateCryptoAmount, createPendingPayment, verifyPayment } from '@/actions/cryptoActions'
 
 interface CryptoPaymentProps {
   plan: 'free' | 'pro' | 'premium'
@@ -9,25 +11,64 @@ interface CryptoPaymentProps {
   onSuccess: () => void
 }
 
-type CryptoType = 'ETH' | 'BNB' | 'USDT'
+type TokenType = 'ETH(ERC20)' | 'BNB(BEP20)' | 'USDT(ERC20)' | 'USDT(BEP20)'
 
 export default function CryptoPayment({ plan, amount, onBack, onSuccess }: CryptoPaymentProps) {
-  const [selectedCrypto, setSelectedCrypto] = useState<CryptoType>('ETH')
-  const [transactionHash, setTransactionHash] = useState('')
+  const { user } = useAppSelector((state) => state.auth)
+  const [selectedToken, setSelectedToken] = useState<TokenType>('ETH(ERC20)')
   const [isVerifying, setIsVerifying] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [paymentId, setPaymentId] = useState<string | null>(null)
+  
+  // Crypto calculation state
+  const [cryptoAmount, setCryptoAmount] = useState<number>(0)
+  const [networkFee, setNetworkFee] = useState<number>(0)
+  const [totalAmount, setTotalAmount] = useState<number>(0)
+  const [cryptoPrice, setCryptoPrice] = useState<number>(0)
 
   const walletAddress = '0x93c6D2624f167a30D5f627b55d8774d6d9540eb5'
 
-  // Crypto conversion rates (example rates - in production, fetch from API)
-  const cryptoRates: { [key in CryptoType]: number } = {
-    ETH: 0.012,
-    BNB: 0.05,
-    USDT: amount
-  }
-
-  const cryptoAmount = cryptoRates[selectedCrypto]
+  // Calculate crypto amount when token type changes
+  useEffect(() => {
+    const calculate = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const result = await calculateCryptoAmount(amount, selectedToken)
+        setCryptoAmount(result.cryptoAmount)
+        setNetworkFee(result.networkFee)
+        setTotalAmount(result.total)
+        setCryptoPrice(result.price)
+        
+        // Create pending payment record
+        if (user) {
+          const paymentResult = await createPendingPayment(
+            user.uid,
+            user.email,
+            plan,
+            selectedToken,
+            result.cryptoAmount,
+            amount,
+            result.networkFee
+          )
+          
+          if (paymentResult.success && paymentResult.paymentId) {
+            setPaymentId(paymentResult.paymentId)
+          }
+        }
+      } catch (err) {
+        setError('Failed to calculate crypto amount. Please try again.')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    calculate()
+  }, [selectedToken, amount, plan, user])
 
   const handleCopyAddress = () => {
     navigator.clipboard.writeText(walletAddress)
@@ -36,24 +77,40 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
   }
 
   const handleVerifyPayment = async () => {
-    if (!transactionHash.trim()) {
-      setError('Please enter a transaction hash')
-      return
-    }
-
-    if (transactionHash.length < 10) {
-      setError('Invalid transaction hash format')
+    if (!paymentId) {
+      setError('Payment record not found. Please refresh and try again.')
       return
     }
 
     setIsVerifying(true)
     setError('')
+    setSuccess('')
 
-    // Simulate verification process
-    setTimeout(() => {
+    try {
+      const result = await verifyPayment(paymentId)
+      
+      if (result.success) {
+        setSuccess('Payment verified successfully! Your membership has been upgraded.')
+        setTimeout(() => {
+          onSuccess()
+        }, 2000)
+      } else {
+        setError(result.error || 'Payment verification failed. Please ensure you sent the correct amount to the wallet address.')
+      }
+    } catch (err) {
+      setError('Verification failed. Please try again.')
+      console.error(err)
+    } finally {
       setIsVerifying(false)
-      onSuccess()
-    }, 2000)
+    }
+  }
+
+  const getTokenDisplay = (token: TokenType) => {
+    if (token === 'ETH(ERC20)') return 'ETH'
+    if (token === 'BNB(BEP20)') return 'BNB'
+    if (token === 'USDT(ERC20)') return 'USDT (ERC20)'
+    if (token === 'USDT(BEP20)') return 'USDT (BEP20)'
+    return token
   }
 
   return (
@@ -77,30 +134,66 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
         </p>
       </div>
 
-      {/* Crypto Selection */}
+      {/* Token Selection */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          Select Cryptocurrency
+          Select Token Type
         </label>
-        <div className="grid grid-cols-3 gap-3">
-          {(['ETH', 'BNB', 'USDT'] as CryptoType[]).map((crypto) => (
+        <div className="grid grid-cols-2 gap-3">
+          {(['ETH(ERC20)', 'BNB(BEP20)', 'USDT(ERC20)', 'USDT(BEP20)'] as TokenType[]).map((token) => (
             <button
-              key={crypto}
-              onClick={() => setSelectedCrypto(crypto)}
+              key={token}
+              onClick={() => setSelectedToken(token)}
+              disabled={loading}
               className={`p-4 border-2 rounded-lg transition-all ${
-                selectedCrypto === crypto
+                selectedToken === token
                   ? 'border-primary bg-blue-50'
                   : 'border-gray-300 hover:border-gray-400'
-              }`}
+              } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">{crypto}</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {crypto === 'USDT' ? `${cryptoAmount}` : `≈${cryptoAmount}`}
-                </div>
+                <div className="text-base font-bold text-gray-900">{getTokenDisplay(token)}</div>
+                {loading && selectedToken === token ? (
+                  <div className="text-sm text-gray-600 mt-1">Calculating...</div>
+                ) : (
+                  <div className="text-sm text-gray-600 mt-1">
+                    {token.includes('USDT') ? `${cryptoAmount.toFixed(2)}` : `≈${cryptoAmount.toFixed(6)}`}
+                  </div>
+                )}
               </div>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Payment Summary */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">Payment Summary</h3>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Plan Amount:</span>
+            <span className="font-medium text-gray-900">${amount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Network Fee:</span>
+            <span className="font-medium text-gray-900">${networkFee.toFixed(2)}</span>
+          </div>
+          <div className="border-t border-gray-300 pt-2 flex justify-between">
+            <span className="font-semibold text-gray-900">Total (USD):</span>
+            <span className="font-bold text-gray-900">${totalAmount.toFixed(2)}</span>
+          </div>
+          {!selectedToken.includes('USDT') && cryptoPrice > 0 && (
+            <div className="flex justify-between text-xs text-gray-500 pt-1">
+              <span>Current {selectedToken.split('(')[0]} Price:</span>
+              <span>${cryptoPrice.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="border-t border-gray-300 pt-2 flex justify-between">
+            <span className="font-semibold text-primary">Amount to Send:</span>
+            <span className="font-bold text-primary">
+              {cryptoAmount.toFixed(selectedToken.includes('USDT') ? 2 : 6)} {selectedToken.split('(')[0]}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -112,19 +205,19 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
             <span className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">
               1
             </span>
-            <span>Send exactly <strong>{cryptoAmount} {selectedCrypto}</strong> to the wallet address below</span>
+            <span>Send exactly <strong>{cryptoAmount.toFixed(selectedToken.includes('USDT') ? 2 : 6)} {selectedToken.split('(')[0]}</strong> to the wallet address below</span>
           </li>
           <li className="flex items-start">
             <span className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">
               2
             </span>
-            <span>Copy the transaction hash from your wallet</span>
+            <span>Make sure to use the correct network: <strong>{selectedToken.includes('ERC20') ? 'Ethereum (ERC20)' : 'BNB Smart Chain (BEP20)'}</strong></span>
           </li>
           <li className="flex items-start">
             <span className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">
               3
             </span>
-            <span>Paste the transaction hash below and click verify</span>
+            <span>After sending, click "Verify Payment" button below to confirm your transaction</span>
           </li>
         </ol>
       </div>
@@ -132,7 +225,7 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
       {/* Wallet Address */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Wallet Address ({selectedCrypto})
+          Wallet Address ({selectedToken.includes('ERC20') ? 'ERC20' : 'BEP20'})
         </label>
         <div className="flex items-center gap-2">
           <input
@@ -164,47 +257,6 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
         </div>
       </div>
 
-      {/* QR Code Placeholder */}
-      <div className="mb-6 flex justify-center">
-        <div className="bg-white border-2 border-gray-300 rounded-lg p-4">
-          <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded">
-            <div className="text-center text-gray-500">
-              <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-              </svg>
-              <p className="text-sm">QR Code</p>
-              <p className="text-xs">Scan to pay</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Transaction Hash Input */}
-      <div className="mb-6">
-        <label htmlFor="txHash" className="block text-sm font-medium text-gray-700 mb-2">
-          Transaction Hash
-        </label>
-        <input
-          type="text"
-          id="txHash"
-          value={transactionHash}
-          onChange={(e) => {
-            setTransactionHash(e.target.value)
-            if (error) setError('')
-          }}
-          placeholder="0x..."
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm ${
-            error ? 'border-red-500' : 'border-gray-300'
-          }`}
-        />
-        {error && (
-          <p className="text-red-500 text-sm mt-1">{error}</p>
-        )}
-        <p className="text-xs text-gray-500 mt-2">
-          Enter the transaction hash after sending the payment
-        </p>
-      </div>
-
       {/* Warning Notice */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
         <div className="flex items-start">
@@ -214,17 +266,47 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
           <div>
             <p className="text-sm font-medium text-yellow-900">Important</p>
             <p className="text-sm text-yellow-800 mt-1">
-              Please send the exact amount. Incorrect amounts may delay your upgrade.
-              Network fees are not included in the amount shown.
+              Please send the EXACT amount shown above. Sending incorrect amounts may result in payment verification failure. 
+              Make sure you're using the correct network ({selectedToken.includes('ERC20') ? 'Ethereum' : 'BNB Smart Chain'}).
             </p>
           </div>
         </div>
       </div>
 
+      {/* Success Message */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-green-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-green-900">Success!</p>
+              <p className="text-sm text-green-800 mt-1">{success}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-red-500 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-red-800">Error</p>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Verify Button */}
       <button
         onClick={handleVerifyPayment}
-        disabled={isVerifying || !transactionHash.trim()}
+        disabled={isVerifying || loading || !paymentId}
         className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isVerifying ? (
@@ -241,7 +323,7 @@ export default function CryptoPayment({ plan, amount, onBack, onSuccess }: Crypt
       </button>
 
       <p className="text-xs text-gray-500 text-center mt-4">
-        Payment verification may take a few minutes depending on network congestion
+        Payment verification checks the blockchain for your transaction. This may take a few minutes depending on network congestion.
       </p>
     </div>
   )
