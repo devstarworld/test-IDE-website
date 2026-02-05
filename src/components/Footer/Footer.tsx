@@ -24,8 +24,8 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-block mb-3 -ml-4">
               <Image
-                src="/images/continue-logo-light.png"
-                alt="Continue"
+                src="/images/zedai_logo.png"
+                alt="ZedAI"
                 width={168}
                 height={56}
                 className="h-14 w-auto"
@@ -49,7 +49,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://docs.continue.dev/intro"
+                    href=""
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-foreground hover:text-muted-foreground transition-colors"
@@ -68,7 +68,7 @@ export default function Footer() {
                     About Us
                   </Link>
                   <a
-                    href="https://www.ycombinator.com/companies/continue/jobs"
+                    href=""
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
@@ -78,7 +78,7 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center gap-2">
                   <a
-                    href="https://blog.continue.dev/"
+                    href=""
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-foreground hover:text-muted-foreground transition-colors"
@@ -88,7 +88,7 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center gap-2">
                   <a
-                    href="https://continuousai.com"
+                    href=""
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-foreground hover:text-muted-foreground transition-colors"
@@ -105,7 +105,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="https://marketplace.visualstudio.com/items?itemName=Continue.continue"
+                  href=""
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-foreground hover:text-muted-foreground transition-colors"
@@ -115,7 +115,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://plugins.jetbrains.com/plugin/22707-continue"
+                  href=""
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-foreground hover:text-muted-foreground transition-colors"
@@ -125,7 +125,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://docs.continue.dev/agent/cli"
+                  href=""
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-foreground hover:text-muted-foreground transition-colors"
@@ -138,11 +138,11 @@ export default function Footer() {
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t gap-4">
-          <div className="text-sm text-muted-foreground">© 2026 Continue, Inc.</div>
+          <div className="text-sm text-muted-foreground">© 2026 ZedAI, Inc.</div>
           
           <div className="flex gap-6">
             <a
-              href="https://x.com/continuedev"
+              href="https://x.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -163,7 +163,7 @@ export default function Footer() {
             </a>
             
             <a
-              href="https://www.linkedin.com/company/continuedev"
+              href="https://www.linkedin.com/company/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -184,7 +184,7 @@ export default function Footer() {
             </a>
             
             <a
-              href="https://github.com/continuedev/continue"
+              href="https://github.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
