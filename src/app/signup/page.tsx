@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { useFirebase } from '@/contexts/FirebaseContext'
 import { signupUser, signInWithGoogle, signInWithGitHub } from '@/actions/authActions'
 import { setError } from '@/store/slices/authSlice'
 
@@ -21,7 +19,6 @@ export default function SignupPage() {
 
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
-  const { firebaseReady, loading: firebaseLoading } = useFirebase()
   const router = useRouter()
 
   // Clear any existing errors when the component mounts
@@ -80,11 +77,6 @@ export default function SignupPage() {
       return // Stop here if validation fails, errors are already set
     }
 
-    if (!firebaseReady) {
-      alert('Firebase is not ready. Please refresh the page and try again.')
-      return
-    }
-
     const result = await dispatch(signupUser({
       name: formData.name,
       email: formData.email,
@@ -99,11 +91,6 @@ export default function SignupPage() {
   }
 
   const handleGoogleSignup = async () => {
-    if (!firebaseReady) {
-      alert('Firebase is not ready. Please refresh the page and try again.')
-      return
-    }
-
     const result = await dispatch(signInWithGoogle())
     if (result.success) {
       router.push('/account')
@@ -111,57 +98,10 @@ export default function SignupPage() {
   }
 
   const handleGitHubSignup = async () => {
-    if (!firebaseReady) {
-      alert('Firebase is not ready. Please refresh the page and try again.')
-      return
-    }
-
     const result = await dispatch(signInWithGitHub())
     if (result.success) {
       router.push('/account')
     }
-  }
-
-  // Show loading while Firebase is initializing
-  if (firebaseLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 mb-2">Initializing Firebase...</p>
-          <p className="text-sm text-gray-500">
-            If this takes too long, please check your internet connection and Firebase configuration.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show error if Firebase failed to initialize
-  if (!firebaseReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-            <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Firebase Connection Failed
-          </h3>
-          <p className="text-sm text-gray-600 mb-6">
-            Unable to connect to Firebase services. Please check your internet connection and try again.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="btn-primary text-white font-medium py-2 px-4 rounded-md"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    )
   }
 
   return (
