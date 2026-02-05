@@ -442,7 +442,7 @@ export const signInWithGoogle = () => async (dispatch: AppDispatch) => {
         name: firebaseUser.displayName || 'Google User',
         email: firebaseUser.email || '',
         role: 'user',
-        emailVerified: firebaseUser.emailVerified,
+        emailVerified: true, // Google users are always verified
         createdAt: new Date().toISOString(),
         provider: 'google'
       }
@@ -462,7 +462,7 @@ export const signInWithGoogle = () => async (dispatch: AppDispatch) => {
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      emailVerified: firebaseUser.emailVerified
+      emailVerified: true // Google users are always verified
     }
 
     // Store in Redux and localStorage
@@ -516,7 +516,7 @@ export const signInWithGitHub = () => async (dispatch: AppDispatch) => {
         name: firebaseUser.displayName || 'GitHub User',
         email: firebaseUser.email || '',
         role: 'user',
-        emailVerified: firebaseUser.emailVerified,
+        emailVerified: true, // GitHub users are always verified
         createdAt: new Date().toISOString(),
         provider: 'github'
       }
@@ -536,7 +536,7 @@ export const signInWithGitHub = () => async (dispatch: AppDispatch) => {
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      emailVerified: firebaseUser.emailVerified
+      emailVerified: true // GitHub users are always verified
     }
 
     // Store in Redux and localStorage
