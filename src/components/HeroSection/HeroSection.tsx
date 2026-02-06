@@ -23,12 +23,11 @@ export default function HeroSection() {
           </Link>
           
           <a
-            href=""
-            target="_blank"
+            href="/login"
             rel="noopener noreferrer"
           >
             <button className="btn-secondary">
-              Learn more →
+              Get Started →
             </button>
           </a>
         </div>
