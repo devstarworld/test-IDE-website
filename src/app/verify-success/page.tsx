@@ -48,7 +48,7 @@ export default function VerifySuccessPage() {
         <div className="text-center">
           <Link href="/">
             <Image
-              src="/images/zedai-logo.png"
+              src="/zedai-logo.png"
               alt="zedai"
               width={40}
               height={40}
