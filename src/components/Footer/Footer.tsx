@@ -65,15 +65,21 @@ export default function Footer() {
                     We&apos;re hiring!
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/get-in-touch"
+                    className="text-foreground hover:text-muted-foreground transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                </li>
                 <li className="flex items-center gap-2">
-                  <a
-                    href=""
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/"
                     className="text-foreground hover:text-muted-foreground transition-colors"
                   >
                     ZedAI, Inc.
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
