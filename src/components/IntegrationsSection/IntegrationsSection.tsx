@@ -10,49 +10,49 @@ export default function IntegrationsSection() {
       name: 'Sentry',
       logo: '/images/integrations/sentry.svg',
       description: 'Open pull requests to address alerts automatically',
-      link: '/continuedev/sentry-webhooks'
+      link: '/zedai/sentry-webhooks'
     },
     {
       name: 'Snyk',
       logo: '/images/integrations/snyk.svg',
       description: 'Fix dependency vulnerabilities automatically',
-      link: '/continuedev/snyk-webhooks'
+      link: '/zedai/snyk-webhooks'
     },
     {
       name: 'Sanity',
       logo: '/images/integrations/sanity.svg',
       description: 'Manage CMS content schema documentation automatically',
-      link: '/continuedev/sanity-schema-docs'
+      link: '/zedai/sanity-schema-docs'
     },
     {
       name: 'Netlify',
       logo: '/images/integrations/netlify.svg',
       description: 'Run audits on PRs and production to compare performance',
-      link: '/continuedev/netlify-website-optimizer'
+      link: '/zedai/netlify-website-optimizer'
     },
     {
       name: 'GitHub',
       logo: '/images/integrations/github.svg',
       description: 'Keep AGENTS.md up to date with new Pull Requests',
-      link: '/continuedev/agentsmd-updater'
+      link: '/zedai/agentsmd-updater'
     },
     {
       name: 'PostHog',
       logo: '/images/integrations/posthog.svg',
       description: 'Update dashboards whenever telemetry is updated',
-      link: '/continuedev/posthog-dashboard-updater'
+      link: '/zedai/posthog-dashboard-updater'
     },
     {
       name: 'Atlassian',
       logo: '/images/integrations/atlassian.svg',
       description: 'Add a summary comment that explains the business value of a merged PR',
-      link: '/continuedev/jira-ticket-updater'
+      link: '/zedai/jira-ticket-updater'
     },
     {
       name: 'Supabase',
       logo: '/images/integrations/supabase.svg',
       description: 'Ensure databases follow security best practices automatically',
-      link: '/continuedev/supabase-rls-policies'
+      link: '/zedai/supabase-rls-policies'
     }
   ]
 
