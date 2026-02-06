@@ -50,7 +50,7 @@ export default function Navbar() {
                 priority
               />
             </Link>
-            
+
             <nav className="hidden md:flex items-center gap-8">
               <Link
                 href="/pricing"
@@ -72,15 +72,12 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/hiring"
-                className="relative inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
+                className="relative flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                </span>
-                Hiring!
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  NEW
+                Hiring
+                <span className="absolute -right-2 -top-1 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
               </Link>
               {user?.role === 'admin' && (
@@ -94,7 +91,7 @@ export default function Navbar() {
             </nav>
 
             <div className="flex items-center gap-4">
-              
+
               {!isLoading && (
                 <>
                   {user ? (
@@ -108,7 +105,7 @@ export default function Navbar() {
                           {user.email}
                           <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
-                        
+
                         {isDropdownOpen && (
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                             <Link
@@ -136,7 +133,7 @@ export default function Navbar() {
                       >
                         Sign In
                       </Link>
-                      
+
                       <Link href="/signup">
                         <button className="btn-primary text-sm h-8 px-3 py-1">
                           Sign Up

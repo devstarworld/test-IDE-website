@@ -30,7 +30,7 @@ export default function HiringPage() {
         </AnimatedSection>
 
         {/* Hero Section */}
-        <AnimatedSection className="text-center px-4 mb-16" delay={100}>
+        <AnimatedSection className="text-center px-4" delay={100}>
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900 animate-fade-in-up">
               Join Our Team
