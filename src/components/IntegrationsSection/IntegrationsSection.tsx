@@ -9,50 +9,42 @@ export default function IntegrationsSection() {
     {
       name: 'Sentry',
       logo: '/images/integrations/sentry.svg',
-      description: 'Open pull requests to address alerts automatically',
-      link: '/zedai/sentry-webhooks'
+      description: 'Open pull requests to address alerts automatically'
     },
     {
       name: 'Snyk',
       logo: '/images/integrations/snyk.svg',
-      description: 'Fix dependency vulnerabilities automatically',
-      link: '/zedai/snyk-webhooks'
+      description: 'Fix dependency vulnerabilities automatically'
     },
     {
       name: 'Sanity',
       logo: '/images/integrations/sanity.svg',
-      description: 'Manage CMS content schema documentation automatically',
-      link: '/zedai/sanity-schema-docs'
+      description: 'Manage CMS content schema documentation automatically'
     },
     {
       name: 'Netlify',
       logo: '/images/integrations/netlify.svg',
-      description: 'Run audits on PRs and production to compare performance',
-      link: '/zedai/netlify-website-optimizer'
+      description: 'Run audits on PRs and production to compare performance'
     },
     {
       name: 'GitHub',
       logo: '/images/integrations/github.svg',
-      description: 'Keep AGENTS.md up to date with new Pull Requests',
-      link: '/zedai/agentsmd-updater'
+      description: 'Keep AGENTS.md up to date with new Pull Requests'
     },
     {
       name: 'PostHog',
       logo: '/images/integrations/posthog.svg',
-      description: 'Update dashboards whenever telemetry is updated',
-      link: '/zedai/posthog-dashboard-updater'
+      description: 'Update dashboards whenever telemetry is updated'
     },
     {
       name: 'Atlassian',
       logo: '/images/integrations/atlassian.svg',
-      description: 'Add a summary comment that explains the business value of a merged PR',
-      link: '/zedai/jira-ticket-updater'
+      description: 'Add a summary comment that explains the business value of a merged PR'
     },
     {
       name: 'Supabase',
       logo: '/images/integrations/supabase.svg',
-      description: 'Ensure databases follow security best practices automatically',
-      link: '/zedai/supabase-rls-policies'
+      description: 'Ensure databases follow security best practices automatically'
     }
   ]
 
@@ -83,14 +75,6 @@ export default function IntegrationsSection() {
               <p className="text-sm text-muted-foreground mb-4">
                 {integration.description}
               </p>
-              
-              <Link
-                href={integration.link}
-                className="text-sm text-purple-400 hover:text-purple-300 transition-colors inline-flex items-center gap-1"
-              >
-                {integration.name} agent
-                <span className="text-xs">↗︎</span>
-              </Link>
             </div>
           ))}
         </div>

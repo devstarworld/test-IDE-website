@@ -21,7 +21,7 @@ export default function Home() {
         <IntegrationsSection />
         <CTASection />
         <Footer />
-      </div>
+      </div>  
     </div>
   )
 }
