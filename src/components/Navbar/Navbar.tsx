@@ -43,19 +43,17 @@ export default function Navbar() {
               >
                 Pricing
               </Link>
-              <a
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Docs
-              </a>
               <Link
                 href="/about-us"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 About Us
+              </Link>
+              <Link
+                href="/get-in-touch"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact Us
               </Link>
               {user?.role === 'admin' && (
                 <Link

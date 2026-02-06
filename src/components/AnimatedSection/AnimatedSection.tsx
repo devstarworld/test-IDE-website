@@ -48,7 +48,7 @@ export default function AnimatedSection({ children, className = '', delay = 0 }:
   return (
     <section
       ref={ref}
-      className={`transition-all duration-800 ease-out ${
+      className={`transition-all duration-[0.5s] ease-out ${
         isVisible 
           ? 'opacity-100 translate-y-0 blur-0' 
           : 'opacity-0 translate-y-8 blur-md'

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { checkAuthState, logoutUser } from '@/actions/authActions'
 import PaymentModal from '@/components/PaymentModal/PaymentModal'
-import { StripedBackground } from '@/components'
+import { Footer, Navbar, StripedBackground } from '@/components'
 import { Download, Copy, User, Check } from 'lucide-react'
 
 export default function AccountPage() {
@@ -14,7 +14,6 @@ export default function AccountPage() {
   const router = useRouter()
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | 'premium'>('pro')
-  const [showUserMenu, setShowUserMenu] = useState(false)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -26,11 +25,6 @@ export default function AccountPage() {
       router.push('/login')
     }
   }, [user, isLoading, router])
-
-  const handleLogout = async () => {
-    await dispatch(logoutUser())
-    router.push('/')
-  }
 
   const getPlanAmount = (plan: 'free' | 'pro' | 'premium') => {
     const amounts = { free: 0, pro: 29, premium: 99 }
@@ -112,40 +106,7 @@ export default function AccountPage() {
       
       <div className="min-h-screen bg-[hsl(0_0%_95.3%)] font-manrope">
         {/* Navbar */}
-        <nav className="bg-gray-900 border-b border-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-14">
-              <div className="text-blue-400 font-semibold text-sm">
-              </div>
-              
-              <div className="relative">
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors text-sm"
-                >
-                  <span className="text-gray-300">{user.email}</span>
-                </button>
-
-                {showUserMenu && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-10" 
-                      onClick={() => setShowUserMenu(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-20">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
-                      >
-                        Sign out
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </nav>
+        <Navbar />
 
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -157,24 +118,16 @@ export default function AccountPage() {
             </h2>
             
             <p className="text-gray-700 mb-4">
-              Install Zedai IDE using{' '}
-              <a href="#" className="text-blue-600 underline hover:text-blue-700">
-                IDE installation instructions
-              </a>
+              Install Zedai IDE
             </p>
-            
             <button
-              className="bg-purple-400 text-white px-6 py-2.5 rounded-lg font-medium mb-6 inline-flex items-center cursor-default"
+              className="bg-purple-600 text-white px-6 py-2.5 rounded-full font-medium mb-6 inline-flex items-center"
             >
               <Download className="w-5 h-5 mr-2" />
               Download for Windows
             </button>
-            
             <p className="text-gray-700 mb-3">
-              Install Zedai CLI in your terminal using{' '}
-              <a href="#" className="text-blue-600 underline hover:text-blue-700">
-                CLI installation instructions
-              </a>
+              Install Zedai CLI in your terminal
             </p>
             
             <div className="bg-purple-100 border border-purple-300 rounded-lg px-4 py-3 font-mono text-sm text-purple-900 inline-flex items-center">
@@ -185,21 +138,6 @@ export default function AccountPage() {
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
-            </div>
-          </StripedBackground>
-
-          {/* User Info Section */}
-          <StripedBackground className="p-6 mb-6 border border-border/50">
-            <div className="flex items-start">
-              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 flex-shrink-0">
-                <User className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">{user.email}</h3>
-                <p className="text-sm text-gray-600">
-                  Signed in with GitHub | <a href="#" className="text-blue-600 hover:underline">UserID</a>
-                </p>
-              </div>
             </div>
           </StripedBackground>
 
@@ -382,6 +320,7 @@ export default function AccountPage() {
             </StripedBackground>
           </div>
         </div>
+        <Footer />
       </div>
     </>
   )

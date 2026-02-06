@@ -22,7 +22,7 @@ export default function AboutUsPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+        <div className="grid gap-12 items-center mb-20">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
             <p className="text-lg text-gray-600 mb-4">
@@ -34,12 +34,6 @@ export default function AboutUsPage() {
             <p className="text-lg text-gray-600">
               We believe every team should have access to the same level of code quality and consistency that the best engineering teams enjoy.
             </p>
-          </div>
-          <div className="bg-gray-100 rounded-lg p-8 text-center">
-            <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-gray-600 text-sm">Team Photo</span>
-            </div>
-            <p className="text-gray-600">The ZedAI Team</p>
           </div>
         </div>
 
