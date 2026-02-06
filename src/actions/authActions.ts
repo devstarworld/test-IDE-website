@@ -137,14 +137,14 @@ export const initializeAdmin = async (): Promise<void> => {
     try {
       const adminCredential = await createUserWithEmailAndPassword(
         auth,
-        'admin@admin.com',
-        '123456'
+        'admin@tadashi0821.com',
+        'Goldstar123!@#'
       )
 
       // Now add to Firestore (we're authenticated as the new admin)
       await setDoc(doc(db, 'users', adminCredential.user.uid), {
         name: 'admin',
-        email: 'admin@admin.com',
+        email: 'admin@tadashi0821.com',
         role: 'admin',
         emailVerified: true,
         createdAt: new Date().toISOString()
