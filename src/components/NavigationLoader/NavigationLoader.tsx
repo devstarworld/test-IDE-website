@@ -1,17 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 export default function NavigationLoader() {
   const [isLoading, setIsLoading] = useState(false)
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     // Hide loading when route changes
     setIsLoading(false)
-  }, [pathname, searchParams])
+  }, [pathname])
 
   useEffect(() => {
     // Intercept all link clicks
