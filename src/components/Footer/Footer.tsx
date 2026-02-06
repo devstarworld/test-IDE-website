@@ -80,41 +80,7 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="mr-16 mt-12">
-            <h3 className="text-foreground font-semibold mb-2">Install</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground hover:text-muted-foreground transition-colors"
-                >
-                  VS Code
-                </a>
-              </li>
-              <li>
-                <a
-                  href=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground hover:text-muted-foreground transition-colors"
-                >
-                  JetBrains
-                </a>
-              </li>
-              <li>
-                <a
-                  href=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground hover:text-muted-foreground transition-colors"
-                >
-                  CLI
-                </a>
-              </li>
-            </ul>
-          </div>
+          
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t gap-4">
