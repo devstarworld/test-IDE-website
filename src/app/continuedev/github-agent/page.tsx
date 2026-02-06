@@ -4,7 +4,7 @@ import Footer from '@/components/Footer/Footer'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'GitHub Agent | Continue',
+  title: 'GitHub Agent | ZedAI',
   description: 'Keep AGENTS.md up to date with new Pull Requests',
 }
 

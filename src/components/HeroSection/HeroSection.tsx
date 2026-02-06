@@ -12,7 +12,7 @@ export default function HeroSection() {
         </h1>
         
         <p className="text-xl sm:text-2xl text-muted-foreground mb-12 leading-relaxed">
-          Writing code got 10x faster. Shipping it didn&apos;t. Continue closes the gap—your team&apos;s rules, defined in code, enforced on every pull request.
+          Writing code got 10x faster. Shipping it didn&apos;t. ZedAI closes the gap—your team&apos;s rules, defined in code, enforced on every pull request.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -23,7 +23,7 @@ export default function HeroSection() {
           </Link>
           
           <a
-            href="https://docs.continue.dev"
+            href=""
             target="_blank"
             rel="noopener noreferrer"
           >

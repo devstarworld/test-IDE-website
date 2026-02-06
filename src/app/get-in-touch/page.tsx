@@ -3,8 +3,8 @@ import Navbar from '@/components/Navbar/Navbar'
 import Footer from '@/components/Footer/Footer'
 
 export const metadata: Metadata = {
-  title: 'Get in Touch | Continue',
-  description: 'Contact the Continue team',
+  title: 'Get in Touch | ZedAI',
+  description: 'Contact the ZedAI team',
 }
 
 export default function GetInTouchPage() {
@@ -34,7 +34,7 @@ export default function GetInTouchPage() {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Email</h3>
-                  <p className="text-gray-600">hello@continue.dev</p>
+                  <p className="text-gray-600">hr@zedai.dev</p>
                 </div>
               </div>
 
@@ -59,7 +59,7 @@ export default function GetInTouchPage() {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Twitter</h3>
-                  <p className="text-gray-600">@continuedev</p>
+                  <p className="text-gray-600">@zedaidev</p>
                 </div>
               </div>
             </div>
@@ -67,13 +67,13 @@ export default function GetInTouchPage() {
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Enterprise Sales</h3>
               <p className="text-gray-600 mb-4">
-                Looking to implement Continue across your organization? Our enterprise team can help you get started with custom integrations, dedicated support, and on-premise deployment options.
+                Looking to implement ZedAI across your organization? Our enterprise team can help you get started with custom integrations, dedicated support, and on-premise deployment options.
               </p>
               <a
-                href="mailto:enterprise@continue.dev"
+                href="mailto:hr@zedai.dev"
                 className="text-primary hover:text-primary/80 font-medium"
               >
-                enterprise@continue.dev
+                hr@zedai.dev
               </a>
             </div>
           </div>

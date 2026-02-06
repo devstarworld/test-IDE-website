@@ -92,9 +92,9 @@ export default function VerifyEmailPage() {
         <div className="text-center">
           <Link href="/">
             <Image
-              src="/images/continue-logo-light.png"
-              alt="Continue"
-              width={120}
+              src="/images/zedai-logo.png"
+              alt="zedai"
+              width={40}
               height={40}
               className="mx-auto h-12 w-auto"
             />

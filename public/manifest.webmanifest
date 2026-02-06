@@ -1,45 +1,72 @@
 {
-  "name": "ZedAI",
+  "name": "ZedAI - AI-Powered Development Automation Platform",
   "short_name": "ZedAI",
-  "description": "Speed up your development with Continuous AI. Deploy background agents in seconds with battle-tested workflows across GitHub, Sentry, Snyk, and Linear. Customize prompts, models, and tools to fit your workflow",
-  "start_url": "/inbox",
-  "scope": "/inbox",
+  "description": "Transform your development workflow with ZedAI's continuous AI agents. Automate GitHub, Sentry, Snyk, and Linear workflows in seconds. Deploy intelligent background agents with battle-tested prompts, custom models, and powerful tools. Boost productivity by 10x with AI-driven automation.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "orientation": "portrait",
+  "theme_color": "#3b82f6",
+  "orientation": "any",
   "categories": [
     "productivity",
-    "developer tools"
+    "developer tools",
+    "business",
+    "utilities"
   ],
   "prefer_related_applications": false,
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/favicon.png",
       "sizes": "256x256",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/favicon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/favicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "screenshots": [
     {
       "src": "/zedai_ad.jpg",
       "sizes": "1920x1080",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "ZedAI Dashboard"
     },
     {
       "src": "/zedai_ad.jpg",
       "sizes": "390x844",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "ZedAI Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pricing",
+      "short_name": "Pricing",
+      "description": "View ZedAI pricing plans",
+      "url": "/pricing",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sign In",
+      "short_name": "Login",
+      "description": "Sign in to your account",
+      "url": "/login",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
     }
   ]
 }

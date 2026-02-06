@@ -14,7 +14,7 @@ export default function FeaturesSection() {
     {
       id: 'card-raise-the-bar',
       title: 'Silent Until It Matters',
-      description: 'Not every PR needs a mermaid diagram. Continue only speaks up when something is wrong (and actually gives you the fix).',
+      description: 'Not every PR needs a mermaid diagram. ZedAI only speaks up when something is wrong (and actually gives you the fix).',
       scale: 1.05,
       zIndex: 20
     },

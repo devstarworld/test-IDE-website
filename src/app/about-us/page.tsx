@@ -4,8 +4,8 @@ import Footer from '@/components/Footer/Footer'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'About Us | Continue',
-  description: 'Learn about the team behind Continue',
+  title: 'About Us | ZedAI',
+  description: 'Learn about the team behind ZedAI',
 }
 
 export default function AboutUsPage() {
@@ -15,7 +15,7 @@ export default function AboutUsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            About Continue
+            About ZedAI
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             We&apos;re building the future of software development with AI agents that understand your codebase and enforce your team&apos;s standards.
@@ -29,7 +29,7 @@ export default function AboutUsPage() {
               The future of coding isn&apos;t writing more code. It&apos;s delegating the boring parts, so you can build the interesting stuff.
             </p>
             <p className="text-lg text-gray-600 mb-4">
-              Continue bridges the gap between writing code and shipping it by automating code reviews, enforcing standards, and catching issues before they reach production.
+              ZedAI bridges the gap between writing code and shipping it by automating code reviews, enforcing standards, and catching issues before they reach production.
             </p>
             <p className="text-lg text-gray-600">
               We believe every team should have access to the same level of code quality and consistency that the best engineering teams enjoy.
@@ -39,7 +39,7 @@ export default function AboutUsPage() {
             <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
               <span className="text-gray-600 text-sm">Team Photo</span>
             </div>
-            <p className="text-gray-600">The Continue Team</p>
+            <p className="text-gray-600">The ZedAI Team</p>
           </div>
         </div>
 

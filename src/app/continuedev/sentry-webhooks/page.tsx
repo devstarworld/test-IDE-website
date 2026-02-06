@@ -4,7 +4,7 @@ import Footer from '@/components/Footer/Footer'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-  title: 'Sentry Agent | Continue',
+  title: 'Sentry Agent | ZedAI',
   description: 'Automatically open pull requests to address Sentry alerts',
 }
 
@@ -48,14 +48,14 @@ export default function SentryWebhooksPage() {
           <h2>Setup</h2>
           <p>
             To get started with the Sentry agent, you&apos;ll need to configure your Sentry webhook 
-            to point to Continue&apos;s endpoint and provide your repository access tokens.
+            to point to ZedAI&apos;s endpoint and provide your repository access tokens.
           </p>
 
           <div className="bg-gray-100 p-6 rounded-lg">
             <h3>Configuration Example</h3>
             <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
 {`{
-  "webhook_url": "https://api.continue.dev/webhooks/sentry",
+  "webhook_url": "https://ZedAI.dev/webhooks/sentry",
   "repository": "your-org/your-repo",
   "alert_threshold": "error",
   "auto_create_pr": true
