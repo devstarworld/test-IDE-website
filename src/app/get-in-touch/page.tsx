@@ -55,7 +55,7 @@ export default function GetInTouchPage() {
                 </div>
 
                 <a
-                  href='https://wa.me/1234567890'
+                  href='https://wa.me/18622392574'
                   rel="noopener noreferrer"
                   target="_blank"
                   className="flex items-start hover:scale-105 translate-all duration-[0.3s]">
@@ -67,13 +67,13 @@ export default function GetInTouchPage() {
                   <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900">WhatsApp</h3>
                     <p className="text-gray-600">
-                      +1 (234) 567-890
+                      +1 (862) 239-2574
                     </p>
                   </div>
                 </a>
 
                 <a
-                  href='mailto:hr@zedai.dev'
+                  href='https://t.me/zedai_support'
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start hover:scale-105 translate-all duration-[0.3s]">
