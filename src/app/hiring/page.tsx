@@ -65,7 +65,7 @@ export default function HiringPage() {
           </AnimatedSection>
 
           {/* What We're Looking For */}
-          <AnimatedSection className="mb-16" delay={300}>
+          <AnimatedSection className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
               What We Value Most
             </h2>
@@ -142,7 +142,7 @@ export default function HiringPage() {
           </AnimatedSection>
 
           {/* Our Process */}
-          <AnimatedSection className="mb-16" delay={400}>
+          <AnimatedSection className="mb-16">
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 md:p-12 border border-gray-200">
               <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
                 Our Hiring Process
@@ -218,7 +218,7 @@ export default function HiringPage() {
           </AnimatedSection>
 
           {/* Compensation & Benefits */}
-          <AnimatedSection className="mb-16" delay={500}>
+          <AnimatedSection className="mb-16">
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-gray-100">
               <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                 Compensation & Benefits
@@ -266,7 +266,7 @@ export default function HiringPage() {
           </AnimatedSection>
 
           {/* CTA Section */}
-          <AnimatedSection className="text-center" delay={600}>
+          <AnimatedSection className="text-center">
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-12 text-white shadow-2xl">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Ready to Join Us?

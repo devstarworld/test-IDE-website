@@ -197,11 +197,11 @@ export default function AdminPage() {
       
       <div className="flex-1 flex">
         {/* Sidebar */}
-        <AnimatedSection delay={100}>
+        <AnimatedSection delay={100} className="flex">
           <aside 
           className={`${
             isSidebarOpen ? 'w-64' : 'w-16'
-          } bg-white border-r border-gray-200 transition-all duration-300 flex flex-col`}
+          } bg-white border-r border-gray-200 transition-all duration-300 flex flex-col min-h-full`}
         >
           <div className="p-4 border-b border-gray-200 flex items-center justify-between mt-3">
             {isSidebarOpen && <h2 className="font-semibold text-lg">Admin Panel</h2>}
@@ -213,7 +213,7 @@ export default function AdminPage() {
             </button>
           </div>
           
-          <nav className="flex-1 p-4">
+          <nav className="flex-1 p-4 h-full">
             <button
               onClick={() => setActiveTab('users')}
               className={`w-full flex items-center gap-3 px-1 py-3 rounded-lg transition-colors mb-2 ${

@@ -6,7 +6,7 @@ import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 
 export default function Footer() {
   return (
-    <AnimatedSection className="relative border-t bg-muted/20 overflow-hidden" delay={600}>
+    <AnimatedSection className="relative border-t bg-muted/20 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none -z-10">
         <Image
           src="/images/footer-gradient.webp"

@@ -5,7 +5,7 @@ import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 
 export default function CTASection() {
   return (
-    <AnimatedSection className="pt-12 pb-24" delay={500}>
+    <AnimatedSection className="pt-12 pb-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-card text-card-foreground shadow-sm bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-2">
           <div className="p-12 text-center">
