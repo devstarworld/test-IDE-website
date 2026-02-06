@@ -15,11 +15,11 @@ export default function VerifyEmailPage() {
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [email, setEmail] = useState('')
-  
+
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
   const router = useRouter()
-  
+
   // Get email from URL params on client side only
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -60,14 +60,14 @@ export default function VerifyEmailPage() {
 
     setPasswordError('')
     const result = await dispatch(resendEmailVerificationByEmail(email, password))
-    
+
     if (result.success) {
       setResendMessage('Verification email sent successfully!')
       setCanResend(false)
       setCountdown(60) // 60 second countdown
       setShowPasswordField(false)
       setPassword('')
-      
+
       // Clear success message after 5 seconds
       setTimeout(() => setResendMessage(''), 5000)
     } else {
@@ -90,16 +90,7 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link href="/">
-            <Image
-              src="/zedai-logo.png"
-              alt="zedai"
-              width={40}
-              height={40}
-              className="mx-auto h-12 w-auto"
-            />
-          </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-4 text-3xl font-bold text-gray-900">
             Verify Your Email
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -107,8 +98,8 @@ export default function VerifyEmailPage() {
           </p>
         </div>
 
-        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
-          <div className="text-center space-y-6">
+        <div className="bg-white py-4 px-6 shadow rounded-lg sm:px-10">
+          <div className="text-center space-y-4">
             {/* Email Icon */}
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
               <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,16 +127,14 @@ export default function VerifyEmailPage() {
 
             {/* Success/Error Messages */}
             {resendMessage && (
-              <div className={`p-3 rounded-md ${
-                resendMessage.includes('successfully') 
-                  ? 'bg-green-50 border border-green-200' 
+              <div className={`p-3 rounded-md ${resendMessage.includes('successfully')
+                  ? 'bg-green-50 border border-green-200'
                   : 'bg-red-50 border border-red-200'
-              }`}>
-                <p className={`text-sm ${
-                  resendMessage.includes('successfully') 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
                 }`}>
+                <p className={`text-sm ${resendMessage.includes('successfully')
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                  }`}>
                   {resendMessage}
                 </p>
               </div>
@@ -174,14 +163,13 @@ export default function VerifyEmailPage() {
                       setPassword(e.target.value)
                       if (passwordError) setPasswordError('')
                     }}
-                    className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      passwordError ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${passwordError ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     placeholder="Enter your password"
                   />
                   {passwordError && <p className="mt-1 text-sm text-red-600">{passwordError}</p>}
                 </div>
-                
+
                 <div className="flex space-x-3">
                   <button
                     onClick={handleResendEmail}
@@ -207,11 +195,10 @@ export default function VerifyEmailPage() {
                 <button
                   onClick={handleResendEmail}
                   disabled={!canResend || isLoading}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                    canResend && !isLoading
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${canResend && !isLoading
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                 >
                   {!canResend ? (
                     `Resend in ${countdown}s`

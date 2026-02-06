@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAppSelector } from '@/store/hooks'
 import Navbar from '@/components/Navbar/Navbar'
 import Footer from '@/components/Footer/Footer'
+import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 import { 
   Menu, 
   PanelLeftClose,
@@ -196,7 +197,8 @@ export default function AdminPage() {
       
       <div className="flex-1 flex">
         {/* Sidebar */}
-        <aside 
+        <AnimatedSection delay={100}>
+          <aside 
           className={`${
             isSidebarOpen ? 'w-64' : 'w-16'
           } bg-white border-r border-gray-200 transition-all duration-300 flex flex-col`}
@@ -237,9 +239,10 @@ export default function AdminPage() {
             </button>
           </nav>
         </aside>
+        </AnimatedSection>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <AnimatedSection className="flex-1 p-8" delay={200}>
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
@@ -556,7 +559,7 @@ export default function AdminPage() {
               </div>
             )}
           </div>
-        </main>
+        </AnimatedSection>
       </div>
 
       <Footer />

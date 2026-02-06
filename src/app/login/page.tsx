@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { loginUser, sendPasswordReset, signInWithGoogle, signInWithGitHub } from '@/actions/authActions'
 import { setError } from '@/store/slices/authSlice'
+import AnimatedSection from '@/components/AnimatedSection/AnimatedSection'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -136,7 +137,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-2">
+      <AnimatedSection className="max-w-md w-full space-y-2">
         {/* Back Button */}
         <div>
           <div className="flex justify-start">
@@ -283,7 +284,7 @@ export default function LoginPage() {
             </div>
           </form>
         </div>
-      </div>
+      </AnimatedSection>
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (
