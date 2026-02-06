@@ -33,7 +33,6 @@ export default function Navbar() {
                 style={{ width: 'auto', height: '40px' }}
                 priority
               />
-              <span className='ml-2 text-2xl font-medium text-gray-500'>ZedAI</span>
             </Link>
             
             <nav className="hidden md:flex items-center gap-8">
