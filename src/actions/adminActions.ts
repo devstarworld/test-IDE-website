@@ -1,11 +1,11 @@
 'use client'
 
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  orderBy, 
-  limit, 
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
   startAfter,
   where,
   doc,
@@ -55,6 +55,8 @@ export async function fetchUsers(
   lastDoc: DocumentSnapshot | null = null
 ): Promise<PaginationResult<UserData>> {
   try {
+    if (!db) throw new Error('Firestore not initialized')
+    
     const usersRef = collection(db, 'users')
     let q = query(usersRef)
 
@@ -108,6 +110,8 @@ export async function fetchPendingPayments(
   lastDoc: DocumentSnapshot | null = null
 ): Promise<PaginationResult<PendingPayment>> {
   try {
+    if (!db) throw new Error('Firestore not initialized')
+    
     const paymentsRef = collection(db, 'pending_payments')
     let q = query(paymentsRef)
 
@@ -154,8 +158,10 @@ export async function fetchPendingPayments(
 // Ban users (bulk action)
 export async function banUsers(userIds: string[]): Promise<void> {
   try {
+    if (!db) throw new Error('Firestore not initialized')
+    
     const promises = userIds.map(async (uid) => {
-      const userRef = doc(db, 'users', uid)
+      const userRef = doc(db!, 'users', uid)
       await updateDoc(userRef, {
         role: 'banned'
       })
@@ -170,8 +176,10 @@ export async function banUsers(userIds: string[]): Promise<void> {
 // Delete users (bulk action)
 export async function deleteUsers(userIds: string[]): Promise<void> {
   try {
+    if (!db) throw new Error('Firestore not initialized')
+    
     const promises = userIds.map(async (uid) => {
-      const userRef = doc(db, 'users', uid)
+      const userRef = doc(db!, 'users', uid)
       await deleteDoc(userRef)
     })
     await Promise.all(promises)
