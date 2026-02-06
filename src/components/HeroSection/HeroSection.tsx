@@ -16,9 +16,9 @@ export default function HeroSection() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/signup">
+          <Link href="">
             <button className="btn-primary">
-              Get started
+              Download for free
             </button>
           </Link>
           
