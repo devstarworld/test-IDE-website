@@ -4,6 +4,7 @@ import './globals.css'
 import ReduxProvider from '@/store/ReduxProvider'
 import { FirebaseProvider } from '@/contexts/FirebaseContext'
 import AppInitializer from '@/components/AppInitializer'
+import NavigationLoader from '@/components/NavigationLoader/NavigationLoader'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -335,6 +336,7 @@ export default function RootLayout({
         <ReduxProvider>
           <FirebaseProvider>
             <AppInitializer />
+            <NavigationLoader />
             {children}
           </FirebaseProvider>
         </ReduxProvider>

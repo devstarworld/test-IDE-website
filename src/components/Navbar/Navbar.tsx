@@ -53,6 +53,12 @@ export default function Navbar() {
 
             <nav className="hidden md:flex items-center gap-8">
               <Link
+                href="/"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Home
+              </Link>
+              <Link
                 href="/pricing"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
