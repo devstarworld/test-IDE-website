@@ -6,25 +6,42 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Remove trailing slash from URLs (except root)
-RewriteCond %{REQUEST_URI} !^/$
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [R=301,L]
-
 # Prevent directory listing for folders
 Options -Indexes
 
-# Serve .html files without extension
+# Handle directory requests - serve .html file when accessing directory with trailing slash
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([^/]+)/$ $1.html [L]
+
+# Serve .html files for routes with trailing slash (non-directory)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-RewriteRule ^([^/]+)/?$ $1.html [L]
+RewriteRule ^([^/]+)/$ $1.html [L]
 
-# Handle nested routes (like /continuedev/github-agent)
+# Serve .html files for routes without trailing slash
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([^/]+)$ $1.html [L]
+
+# Handle nested directory requests with trailing slash
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{DOCUMENT_ROOT}/$1/$2.html -f
+RewriteRule ^([^/]+)/([^/]+)/$ $1/$2.html [L]
+
+# Handle nested routes with trailing slash (non-directory)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/$1/$2.html -f
-RewriteRule ^([^/]+)/([^/]+)/?$ $1/$2.html [L]
+RewriteRule ^([^/]+)/([^/]+)/$ $1/$2.html [L]
+
+# Handle nested routes without trailing slash
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1/$2.html -f
+RewriteRule ^([^/]+)/([^/]+)$ $1/$2.html [L]
 
 # Redirect non-existent pages to home (but allow static assets)
 RewriteCond %{REQUEST_FILENAME} !-f
